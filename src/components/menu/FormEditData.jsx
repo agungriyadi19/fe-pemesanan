@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -94,7 +95,7 @@ const FormEditData = () => {
     }
   };
 
-/* eslint-disable */
+
   return (
     <div className="flex w-full justify-center items-center">
       <div className="z-999">

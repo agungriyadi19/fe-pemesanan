@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Notification from "../Notification";
@@ -62,7 +63,6 @@ function FormTambahData() {
     }
   };
 
-/* eslint-disable */
   return (
     <div className="flex w-full justify-center items-center">
       <div className="z-999">
