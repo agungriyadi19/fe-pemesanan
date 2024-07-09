@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import Session from "./pages/Session";
+// import Session from "./pages/Session";
 import HomePage from "./pages/HomePage";
 
 import AddUserPage from "./pages/user/AddUserPage";
