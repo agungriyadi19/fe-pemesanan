@@ -22,21 +22,21 @@ function App() {
     <BrowserRouter>
       <Routes>
       {/* <Route exact path="/" component={<Session/>} /> */}
-        <Route path="/register" component={<Register/>} />
-        <Route path="/login" component={<Login/>} />
-        <Route path="/" element={<HomePage />} />
+        <Route exact path="/register" component={<Register/>} />
+        <Route exact path="/login" component={<Login/>} />
+        <Route exact path="/" element={<HomePage />} />
         
-        <Route path="/order" element={<ListOrderPage />} />
-        <Route path="/order/add" element={<AddOrderPage />} />
-        <Route path="order/edit/:id" element={<EditOrderPage />} />
+        <Route exact path="/order" element={<ListOrderPage />} />
+        <Route exact path="/order/add" element={<AddOrderPage />} />
+        <Route exact path="order/edit/:id" element={<EditOrderPage />} />
 
-        <Route path="/menu" element={<ListMenuPage />} />
-        <Route path="/menu/add" element={<AddMenuPage />} />
-        <Route path="/menu/edit/:id" element={<EditMenuPage />} />
+        <Route exact path="/menu" element={<ListMenuPage />} />
+        <Route exact path="/menu/add" element={<AddMenuPage />} />
+        <Route exact path="/menu/edit/:id" element={<EditMenuPage />} />
 
-        <Route path="/user" element={<ListUserPage />} />
-        <Route path="/user/add" element={<AddUserPage />} />
-        <Route path="/user/edit/:id" element={<EditUserPage />} />
+        <Route exact path="/user" element={<ListUserPage />} />
+        <Route exact path="/user/add" element={<AddUserPage />} />
+        <Route exact path="/user/edit/:id" element={<EditUserPage />} />
       </Routes>
     </BrowserRouter>
   );
