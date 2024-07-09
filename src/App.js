@@ -21,10 +21,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-      <Route exact path="/" component={<Session/>} />
+      {/* <Route exact path="/" component={<Session/>} /> */}
         <Route path="/register" component={<Register/>} />
         <Route path="/login" component={<Login/>} />
-        <Route path="/dashboard" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
         
         <Route path="/order" element={<ListOrderPage />} />
         <Route path="/order/add" element={<AddOrderPage />} />
