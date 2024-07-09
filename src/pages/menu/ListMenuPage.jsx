@@ -21,7 +21,7 @@ const DataMenuPage = () => {
   const getData = async () => {
     try {
       const response = await axios.get(Endpoints.menu);
-      if (response.data.menus && response.data.menus.length >= 0) {
+      if (response.data.menus && response.data.menus.length > 0) {
         setMenuData(response.data.menus);
       }
     } catch (error) {
@@ -33,7 +33,7 @@ const DataMenuPage = () => {
   const getCategories = async () => {
     try {
       const response = await axios.get(Endpoints.category);
-      if (response.data.categories && response.data.categories.length >= 0) {
+      if (response.data.categories && response.data.categories.length > 0) {
         setCategories(response.data.categories);
       }
     } catch (error) {

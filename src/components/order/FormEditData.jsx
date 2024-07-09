@@ -6,7 +6,7 @@ import Notification from "../../components/Notification";
 const FormEditData = () => {
   const [amount, setAmount] = useState("");
   const [tableNumber, setTableNumber] = useState("");
-  const [statusId, setStatusId] = useState(1); // Default status ID
+  const [statusId] = useState(1); // Default status ID
   const [orderDate, setOrderDate] = useState("");
   const [menuId, setMenuId] = useState("");
   const [menus, setMenus] = useState([]);

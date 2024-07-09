@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default ({ errors }) => (
+const Errors = (errors) => {
   <div>
     {errors.map((error) => (
       <li key={error} className="errors">
@@ -8,4 +8,6 @@ export default ({ errors }) => (
       </li>
     ))}
   </div>
-)
+};
+
+export default Errors;

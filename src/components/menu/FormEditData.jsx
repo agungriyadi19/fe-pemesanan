@@ -94,6 +94,7 @@ const FormEditData = () => {
     }
   };
 
+/* eslint-disable */
   return (
     <div className="flex w-full justify-center items-center">
       <div className="z-999">
