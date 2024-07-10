@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
 import Notification from "../../components/Notification";
-import { Endpoints, apiURl } from "../../api";
+import { Endpoints } from "../../api"; // Tidak memerlukan apiURL karena base64 tidak memerlukan URL
 
 const DataMenuPage = () => {
   const [menuData, setMenuData] = useState([]);
@@ -50,7 +50,7 @@ const DataMenuPage = () => {
       getData(); // Refresh data after deletion
     } catch (error) {
       console.log(error);
-      setMsg(error);
+      setMsg(error.message || "Error deleting data");
       setIsError(true);
     }
   };
@@ -154,7 +154,7 @@ const DataMenuPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <img
-                          src={`${apiURl}/${item.image}`}
+                          src={`data:image/png;base64,${item.image}`}
                           alt={item.name}
                           className="w-20 h-20 object-cover"
                         />
@@ -210,7 +210,7 @@ const DataMenuPage = () => {
               filteredMenuData.map((item, index) => (
                 <div key={item.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
                   <img
-                    src={`${apiURl}/${item.image}`}
+                    src={`data:image/png;base64,${item.image}`}
                     alt={item.name}
                     className="w-full h-48 object-cover"
                   />
