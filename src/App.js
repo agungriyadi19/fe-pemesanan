@@ -1,6 +1,5 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Register from "./pages/Register";
 import Login from "./pages/Login";
 // import Session from "./pages/Session";
 import HomePage from "./pages/HomePage";
@@ -17,13 +16,14 @@ import AddMenuPage from "./pages/menu/AddMenuPage";
 import EditMenuPage from "./pages/menu/EditMenuPage";
 import ListMenuPage from "./pages/menu/ListMenuPage";
 
+import Settings from "./pages/Settings";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
       {/* <Route exact path="/" component={<Session/>} /> */}
-        <Route exact path="/register" component={<Register/>} />
-        <Route exact path="/login" component={<Login/>} />
+        <Route exact path="/login" element={<Login/>} />
         <Route exact path="/" element={<HomePage />} />
         
         <Route exact path="/order" element={<ListOrderPage />} />
@@ -37,6 +37,8 @@ function App() {
         <Route exact path="/user" element={<ListUserPage />} />
         <Route exact path="/user/add" element={<AddUserPage />} />
         <Route exact path="/user/edit/:id" element={<EditUserPage />} />
+
+        <Route exact path="/settings" element={<Settings/>} />
       </Routes>
     </BrowserRouter>
   );

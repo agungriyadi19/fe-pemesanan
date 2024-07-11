@@ -57,6 +57,14 @@ const NavbarComponent = () => {
                   <span className="ml-2">Data User</span>
                 </a>
               </li>
+              <li className="nav-item">
+                <a
+                  className="px-3 py-2 flex items-center text-md leading-snug text-purple-700 hover:opacity-75"
+                  href="/settings"
+                >
+                  <span className="ml-2">Setting</span>
+                </a>
+              </li>
             </ul>
             <ul className="ml-auto">
               <li>
