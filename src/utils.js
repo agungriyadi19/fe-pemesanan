@@ -6,3 +6,12 @@ export const createCookie = (cookieName, cookieValue, hourToExpire,) => {
 
 export const deleteCookie = (name,) =>
   (document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;')
+
+export const numberWithCommas = (x) => {
+  console.log(x);
+  if (x === undefined || x === null) {
+    return "";
+  }
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+

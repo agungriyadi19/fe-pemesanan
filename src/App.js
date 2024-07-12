@@ -17,6 +17,7 @@ import EditMenuPage from "./pages/menu/EditMenuPage";
 import ListMenuPage from "./pages/menu/ListMenuPage";
 
 import Settings from "./pages/Settings";
+import { Home, Sukses } from './pages/customer'
 
 function App() {
   return (
@@ -39,6 +40,10 @@ function App() {
         <Route exact path="/user/edit/:id" element={<EditUserPage />} />
 
         <Route exact path="/settings" element={<Settings/>} />
+
+
+        <Route path="/customer" element={<Home/>} exact />
+        <Route path="/sukses" element={<Sukses/>} exact />
       </Routes>
     </BrowserRouter>
   );
