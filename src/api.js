@@ -11,4 +11,5 @@ export const Endpoints = {
   category: `${apiURl}/api/categories`,
   role: `${apiURl}/api/roles`,
   status: `${apiURl}/api/statuses`,
+  setting: `${apiURl}/api/settings`,
 }
