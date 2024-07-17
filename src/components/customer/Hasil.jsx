@@ -13,7 +13,7 @@ export default class Hasil extends Component {
     this.state = {
       showModal: false,
       keranjangDetail: false,
-      jumlah: 0,
+      amount: 0,
       keterangan: '',
       totalHarga: 0,
     }
@@ -23,7 +23,7 @@ export default class Hasil extends Component {
     this.setState({
       showModal: true,
       keranjangDetail: menuKeranjang,
-      jumlah: menuKeranjang.jumlah,
+      amount: menuKeranjang.amount,
       keterangan: menuKeranjang.keterangan,
       totalHarga: menuKeranjang.total_price
     })
@@ -37,18 +37,18 @@ export default class Hasil extends Component {
 
   tambah = () => {
     this.setState({
-      jumlah: this.state.jumlah + 1,
+      amount: this.state.amount + 1,
       totalHarga:
-        this.state.keranjangDetail.menu.price * (this.state.jumlah + 1),
+        this.state.keranjangDetail.menu.price * (this.state.amount + 1),
     });
   };
 
   kurang = () => {
-    if (this.state.jumlah !== 1) {
+    if (this.state.amount !== 1) {
       this.setState({
-        jumlah: this.state.jumlah - 1,
+        amount: this.state.amount - 1,
         totalHarga:
-          this.state.keranjangDetail.menu.price * (this.state.jumlah - 1),
+          this.state.keranjangDetail.menu.price * (this.state.amount - 1),
       });
     }
   };
@@ -65,7 +65,7 @@ export default class Hasil extends Component {
     this.handleClose();
 
     const data = {
-      jumlah: this.state.jumlah,
+      amount: this.state.amount,
       keterangan: this.state.keterangan,
     };
 

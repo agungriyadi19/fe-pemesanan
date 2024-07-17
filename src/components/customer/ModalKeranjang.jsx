@@ -9,7 +9,7 @@ const ModalKeranjang = ({
     showModal,
     handleClose,
     keranjangDetail,
-    jumlah,
+    amount,
     keterangan,
     tambah,
     kurang,
@@ -73,7 +73,7 @@ const ModalKeranjang = ({
                                                     <button type="button" className="bg-blue-500 text-white px-2 py-1 rounded-md" onClick={() => kurang()}>
                                                         <FontAwesomeIcon icon={faMinus} />
                                                     </button>
-                                                    <strong className="mx-4">{jumlah}</strong>
+                                                    <strong className="mx-4">{amount}</strong>
                                                     <button type="button" className="bg-blue-500 text-white px-2 py-1 rounded-md" onClick={() => tambah()}>
                                                         <FontAwesomeIcon icon={faPlus} />
                                                     </button>

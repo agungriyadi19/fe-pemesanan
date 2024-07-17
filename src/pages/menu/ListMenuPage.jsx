@@ -3,6 +3,7 @@ import Layout from "../Layout";
 import axios from "axios";
 import Notification from "../../components/Notification";
 import { Endpoints } from "../../api"; // Tidak memerlukan apiURL karena base64 tidak memerlukan URL
+import { numberWithCommas } from '../../utils'
 
 const DataMenuPage = () => {
   const [menuData, setMenuData] = useState([]);
@@ -163,7 +164,7 @@ const DataMenuPage = () => {
                         {item.description}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.price}
+                        Rp. {numberWithCommas(item.price)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {getCategoryName(item.category_id)}
@@ -217,7 +218,7 @@ const DataMenuPage = () => {
                   <div className="p-4">
                     <h3 className="font-bold text-lg mb-2">{item.name}</h3>
                     <p className="text-gray-700 mb-2">{item.description}</p>
-                    <p className="text-gray-700 mb-2">Price: {item.price}</p>
+                    <p className="text-gray-700 mb-2">Price: Rp. {numberWithCommas(item.price)}</p>
                     <p className="text-gray-700 mb-4">Category: {getCategoryName(item.category_id)}</p>
                     <div className="flex justify-between">
                       <a

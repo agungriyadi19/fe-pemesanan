@@ -86,14 +86,14 @@ export default class Home extends Component {
                 {/* Navigation Component */}
                 <NavComponents />
                 <div className="container mx-auto py-8">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-8 gap-4">
                         {/* ListCategories Component */}
                         <div className="col-span-1">
                             <ListCategories changeCategory={this.changeCategory} dipilih={dipilih} />
                         </div>
 
                         {/* Menus List */}
-                        <div className="col-span-2">
+                        <div className="col-span-5">
                             <h2 className="text-2xl font-bold mb-4">Daftar Produk</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {menus.map(menu => (
@@ -101,7 +101,7 @@ export default class Home extends Component {
                                 ))}
                             </div>
                         </div>
-                        <div className='col-span-1'>
+                        <div className='col-span-2'>
                             <Hasil keranjangs={keranjangs} {...this.props} getListKeranjang={this.getListKeranjang} />
                         </div>
                     </div>
