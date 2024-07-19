@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
-import Notification from "../../components/Notification";
-import { Endpoints } from "../../api";
-import DetailOrder from "../../components/order/DetailOrder";
+import Notification from "../../../components/Notification";
+import { Endpoints } from "../../../api";
+import DetailOrder from "../../../components/order/DetailOrder";
 
 const DataOrderPage = () => {
   const [orderData, setOrderData] = useState([]);
@@ -12,8 +12,6 @@ const DataOrderPage = () => {
   const [isError, setIsError] = useState(false);
   const [filterOrderCode, setFilterOrderCode] = useState(""); // State for filtering by order code
   const [filterStatus, setFilterStatus] = useState(""); // State for filtering by status
-  const [startDate, setStartDate] = useState(""); // State for start date filter
-  const [endDate, setEndDate] = useState(""); // State for end date filter
   const [detailOrderId, setDetailOrderId] = useState(null); // State to manage detail visibility
   const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
 
@@ -46,27 +44,21 @@ const DataOrderPage = () => {
     }
   };
 
+  const deleteOrder = async (orderId) => {
+    try {
+      await axios.delete(`${Endpoints.order}/${orderId}`);
+      setMsg("Order successfully deleted");
+      setIsError(false);
+      getData(); // Refresh data after deletion
+    } catch (error) {
+      setMsg("Failed to delete order");
+      setIsError(true);
+    }
+  };
+
   const getStatusName = (statusId) => {
     const status = statuses.find((status) => status.id === statusId);
     return status ? status.name : "Unknown";
-  };
-
-  const handleDateFilter = () => {
-    // Convert dates to suitable format for backend API
-    const startDateFormatted = startDate ? new Date(startDate).toISOString() : "";
-    const endDateFormatted = endDate ? new Date(endDate).toISOString() : "";
-
-    // Filter orderData based on date range
-    const filteredByDate = orderData.filter((order) => {
-      const orderDate = new Date(order.order_date);
-      return (
-        (!startDateFormatted || orderDate >= new Date(startDateFormatted)) &&
-        (!endDateFormatted || orderDate <= new Date(endDateFormatted))
-      );
-    });
-
-    // Update filteredOrderData state with filtered results
-    setOrderData(filteredByDate);
   };
 
   const formatDate = (dateString) => {
@@ -119,60 +111,30 @@ const DataOrderPage = () => {
         <h1 className="text-3xl font-semibold mb-3 text-center">Data Order</h1>
 
         <div className="mt-4 mb-4 flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0 flex items-center space-x-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Filter by Order Code</label>
-              <input
-                className="border border-gray-300 p-2 mr-2"
-                type="text"
-                placeholder="Order Code"
-                value={filterOrderCode}
-                onChange={(e) => setFilterOrderCode(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Filter by Status</label>
-              <select
-                className="border border-gray-300 p-2"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="">Select Status</option>
-                {statuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Filter by Order Code</label>
+            <input
+              className="border border-gray-300 p-2 mr-2"
+              type="text"
+              placeholder="Order Code"
+              value={filterOrderCode}
+              onChange={(e) => setFilterOrderCode(e.target.value)}
+            />
           </div>
-          
-          <div className="mb-4 md:mb-0 flex items-center space-x-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Start Date</label>
-              <input
-                className="border border-gray-300 p-2 mr-2"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">End Date</label>
-              <input
-                className="border border-gray-300 p-2 mr-2"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-            <button
-              onClick={handleDateFilter}
-              className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Filter by Status</label>
+            <select
+              className="border border-gray-300 p-2"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
             >
-              Filter by Date
-            </button>
+              <option value="">Select Status</option>
+              {statuses.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {status.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -212,12 +174,34 @@ const DataOrderPage = () => {
                               {formatDate(order.order_date)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <button
-                                onClick={() => toggleDetail(order.id)}
-                                className="bg-yellow-500 hover:bg-yellow-700 text-white p-2 rounded-lg"
-                              >
-                                Detail
-                              </button>
+                              <div className="flex items-center space-x-2">
+                                <a
+                                  href={`/order/edit/${order.id}`}
+                                  className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
+                                >
+                                  Edit
+                                </a>
+                                <button
+                                  onClick={() => {
+                                    if (
+                                      window.confirm(
+                                        "Are you sure you want to delete this order?"
+                                      )
+                                    ) {
+                                      deleteOrder(order.id);
+                                    }
+                                  }}
+                                  className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg"
+                                >
+                                  Delete
+                                </button>
+                                <button
+                                  onClick={() => toggleDetail(order.id)}
+                                  className="bg-yellow-500 hover:bg-yellow-700 text-white p-2 rounded-lg"
+                                >
+                                  Detail
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         </React.Fragment>

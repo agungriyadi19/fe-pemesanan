@@ -1,4 +1,3 @@
-// src/components/admin/Settings.jsx
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode.react';
 import html2canvas from 'html2canvas';
@@ -11,44 +10,43 @@ import Layout from './Layout';
 import 'leaflet/dist/leaflet.css';
 import Swal from 'sweetalert2';
 import { Endpoints } from "../api";
-import { getLocalIP } from '../utils'; // Import the utility function
 
 const Settings = () => {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [seats, setSeats] = useState('');
-  const [latitude, setLatitude] = useState(-6.1754);
-  const [longitude, setLongitude] = useState(106.8272);
+  const [latitude, setLatitude] = useState(-6.1754); // Default to Jakarta, Indonesia
+  const [longitude, setLongitude] = useState(106.8272); // Default to Jakarta, Indonesia
   const [radius, setRadius] = useState(1000);
-  const [wifiIP, setWifiIP] = useState('');
 
   useEffect(() => {
-    // Fetch settings from the API when the component mounts
+    // Fetch settings from the server
     axios.get(Endpoints.setting)
       .then(response => {
         const settings = response.data.settings;
         setTitle(settings.title);
         setSubtitle(settings.subtitle);
         setSeats(settings.seats);
-        setLatitude(settings.latitude);
-        setLongitude(settings.longitude);
-        setRadius(settings.radius);
-        setWifiIP(settings.wifi_ip);
+        setLatitude(settings.latitude || -6.1754); // Default if settings do not provide value
+        setLongitude(settings.longitude || 106.8272); // Default if settings do not provide value
+        setRadius(settings.radius || 1000); // Default if settings do not provide value
       })
       .catch(error => {
         console.error('There was an error fetching the settings!', error);
       });
 
-    // Get the local IP address
-    getLocalIP()
-      .then(ips => {
-        if (ips.length > 0) {
-          setWifiIP(ips[0]);
+    // Fetch the user's current location if available
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+        },
+        (error) => {
+          console.error('Error getting user location:', error);
         }
-      })
-      .catch(error => {
-        console.error('There was an error getting the local IP address!', error);
-      });
+      );
+    }
   }, []);
 
   const handleSaveSettings = () => {
@@ -59,7 +57,6 @@ const Settings = () => {
       latitude: parseFloat(latitude),
       longitude: parseFloat(longitude),
       radius: parseFloat(radius),
-      wifi_ip: wifiIP,
     };
 
     axios.post(Endpoints.setting, settings)
@@ -171,6 +168,33 @@ const Settings = () => {
     );
   };
 
+  const handleGetUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+        },
+        (error) => {
+          console.error('Error getting user location:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: 'There was an error getting your location.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      );
+    } else {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Geolocation is not supported by this browser.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
+  };
+
   return (
     <Layout>
       <div className="mt-5 container mx-auto">
@@ -218,34 +242,25 @@ const Settings = () => {
                   onChange={(e) => setSeats(e.target.value)}
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="wifiIP">
-                  WiFi IP
-                </label>
-                <input
-                  id="wifiIP"
-                  className="border border-gray-300 p-2 w-full"
-                  type="text"
-                  placeholder="WiFi IP"
-                  value={wifiIP}
-                  onChange={(e) => setWifiIP(e.target.value)}
-                />
-              </div>
+              <button
+                onClick={handleGetUserLocation}
+                className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+              >
+                Get My Location
+              </button>
             </div>
+
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="map">
-                Location
-              </label>
-              <div className="border border-gray-300 rounded-lg" style={{ height: '400px' }}>
-                <MapContainer center={[latitude, longitude]} zoom={13} style={{ height: '100%' }}>
+              <div className="h-96 mb-4" id="map">
+                <MapContainer center={[latitude, longitude]} zoom={15} style={{ width: '100%', height: '100%' }}>
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                   />
                   <LocationMarker />
                 </MapContainer>
               </div>
-              <div className="mt-4">
+              <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="radius">
                   Radius (meters)
                 </label>
@@ -253,33 +268,35 @@ const Settings = () => {
                   id="radius"
                   className="border border-gray-300 p-2 w-full"
                   type="number"
-                  placeholder="Radius (meters)"
+                  placeholder="Radius in meters"
                   value={radius}
                   onChange={(e) => setRadius(e.target.value)}
                 />
               </div>
             </div>
           </div>
-          <button
-            onClick={handleSaveSettings}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-          >
-            Save Settings
-          </button>
+          <div className="mt-4 text-center">
+            <button
+              onClick={handleSaveSettings}
+              className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+            >
+              Save Settings
+            </button>
+          </div>
         </div>
 
-        <div>
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-2xl">QR Codes:</h2>
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4 text-center">QR Codes for Seats</h2>
+          <div className="flex flex-wrap justify-center">
+            {renderQRCodes()}
+          </div>
+          <div className="mt-4 text-center">
             <button
               onClick={handleDownloadAll}
-              className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
             >
               Download All QR Codes
             </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {renderQRCodes()}
           </div>
         </div>
       </div>

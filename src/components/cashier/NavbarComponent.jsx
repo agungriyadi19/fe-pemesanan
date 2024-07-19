@@ -34,48 +34,7 @@ const NavbarComponent = () => {
             }
             id="example-navbar-danger"
           >
-            <ul className="flex flex-col lg:flex-row list-none lg:ml-auto justify-center items-center ml-auto">
-              <li className="nav-item">
-                <a
-                  className={`px-3 py-2 flex items-center text-md leading-snug text-purple-700 hover:opacity-75 ${
-                    currentPath === "/order" ? "active" : ""
-                  }`}
-                  href="/order"
-                >
-                  <span className="ml-2">Home</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a
-                  className={`px-3 py-2 flex items-center text-md leading-snug text-purple-700 hover:opacity-75 ${
-                    currentPath === "/menu" ? "active" : ""
-                  }`}
-                  href="/menu"
-                >
-                  <span className="ml-2">Data Menu</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a
-                  className={`px-3 py-2 flex items-center text-md leading-snug text-purple-700 hover:opacity-75 ${
-                    currentPath === "/user" ? "active" : ""
-                  }`}
-                  href="/user"
-                >
-                  <span className="ml-2">Data User</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a
-                  className={`px-3 py-2 flex items-center text-md leading-snug text-purple-700 hover:opacity-75 ${
-                    currentPath === "/settings" ? "active" : ""
-                  }`}
-                  href="/settings"
-                >
-                  <span className="ml-2">Setting</span>
-                </a>
-              </li>
-            </ul>
+            
             <ul className="ml-auto">
               <li>
                 <div className="relative inline-block text-left">

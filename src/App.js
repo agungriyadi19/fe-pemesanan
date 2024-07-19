@@ -11,6 +11,7 @@ import ListUserPage from "./pages/user/ListUserPage";
 import AddOrderPage from "./pages/order/AddOrderPage";
 import EditOrderPage from "./pages/order/EditOrderPage";
 import ListOrderPage from "./pages/order/ListOrderPage";
+import CashierListOrderPage from "./pages/cashier/order/CashierListOrderPage";
 
 import AddMenuPage from "./pages/menu/AddMenuPage";
 import EditMenuPage from "./pages/menu/EditMenuPage";
@@ -27,6 +28,8 @@ function App() {
         <Route exact path="/login" element={<Login/>} />
         <Route exact path="/" element={<HomePage />} />
         
+        <Route exact path="/cashier" element={<CashierListOrderPage />} />
+
         <Route exact path="/order" element={<ListOrderPage />} />
         <Route exact path="/order/add" element={<AddOrderPage />} />
         <Route exact path="order/edit/:id" element={<EditOrderPage />} />
