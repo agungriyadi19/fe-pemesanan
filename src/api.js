@@ -1,4 +1,4 @@
-export const apiURl = 'https://inevitable-imogen-studenttest-64f4521b.koyeb.app'
+export const apiURl = 'http://localhost:8081'
 
 export const Endpoints = {
   login: `${apiURl}/api/users/login`,
