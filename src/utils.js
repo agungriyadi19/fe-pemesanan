@@ -1,5 +1,3 @@
-import Peer from 'simple-peer';
-
 export const createCookie = (cookieName, cookieValue, hourToExpire,) => {
   const date = new Date()
   date.setTime(date.getTime() + hourToExpire * 60 * 60 * 1000,)

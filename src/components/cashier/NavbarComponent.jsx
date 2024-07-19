@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { FaBars } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
 
 const NavbarComponent = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const location = useLocation();
-  const currentPath = location.pathname;
 
   return (
     <div className="font-montserrat">
