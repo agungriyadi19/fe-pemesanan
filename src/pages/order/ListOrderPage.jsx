@@ -4,6 +4,7 @@ import axios from "axios";
 import Notification from "../../components/Notification";
 import { Endpoints } from "../../api";
 import DetailOrder from "../../components/order/DetailOrder";
+import { readCookie } from '../../utils'; // Import the readCookie function
 
 const DataOrderPage = () => {
   const [orderData, setOrderData] = useState([]);
@@ -23,8 +24,13 @@ const DataOrderPage = () => {
   }, []);
 
   const getData = async () => {
+    const token = readCookie('token'); // Retrieve the token from cookies
     try {
-      const response = await axios.get(Endpoints.order);
+      const response = await axios.get(Endpoints.order, {
+        headers: {
+          Authorization: `Bearer ${token}` // Include token in headers
+        }
+      });
       if (response.data.orders && response.data.orders.length >= 0) {
         setOrderData(response.data.orders);
       }
@@ -35,8 +41,13 @@ const DataOrderPage = () => {
   };
 
   const getStatuses = async () => {
+    const token = readCookie('token'); // Retrieve the token from cookies
     try {
-      const response = await axios.get(Endpoints.status);
+      const response = await axios.get(Endpoints.status, {
+        headers: {
+          Authorization: `Bearer ${token}` // Include token in headers
+        }
+      });
       if (response.data.statuses && response.data.statuses.length >= 0) {
         setStatuses(response.data.statuses);
       }
@@ -101,6 +112,7 @@ const DataOrderPage = () => {
       };
     }
     acc[key].menus.push({
+      status_name: order.status_name,
       name: order.menu.name,
       price: order.menu.price,
       amount: order.amount
@@ -110,6 +122,12 @@ const DataOrderPage = () => {
 
   const groupedOrders = Object.values(groupedOrderData);
 
+  // Calculate total for each order
+  const ordersWithTotal = groupedOrders.map(order => {
+    const total = order.menus.reduce((sum, menu) => sum + (menu.price * menu.amount), 0);
+    return { ...order, total };
+  });
+
   return (
     <Layout>
       <div className="z-999">
@@ -118,27 +136,27 @@ const DataOrderPage = () => {
       <div className="mt-5 container mx-auto px-4">
         <h1 className="text-3xl font-semibold mb-3 text-center">Data Order</h1>
 
-        <div className="mt-4 mb-4 flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0 flex items-center space-x-4">
+        <div className="mt-4 mb-4 flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 justify-between items-center">
+          <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:items-center">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Filter by Order Code</label>
+              <label className="block text-sm font-medium text-gray-700">Filter Kode Order</label>
               <input
-                className="border border-gray-300 p-2 mr-2"
+                className="border border-gray-300 p-2 mr-2 w-full md:w-auto"
                 type="text"
-                placeholder="Order Code"
+                placeholder="Kode Order"
                 value={filterOrderCode}
                 onChange={(e) => setFilterOrderCode(e.target.value)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Filter by Status</label>
+              <label className="block text-sm font-medium text-gray-700">Filter Status</label>
               <select
-                className="border border-gray-300 p-2"
+                className="border border-gray-300 p-2 w-full md:w-auto"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
-                <option value="">Select Status</option>
+                <option value="">Pilih Status</option>
                 {statuses.map((status) => (
                   <option key={status.id} value={status.id}>
                     {status.name}
@@ -148,20 +166,20 @@ const DataOrderPage = () => {
             </div>
           </div>
           
-          <div className="mb-4 md:mb-0 flex items-center space-x-4">
+          <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:items-center">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Start Date</label>
+              <label className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
               <input
-                className="border border-gray-300 p-2 mr-2"
+                className="border border-gray-300 p-2 w-full md:w-auto"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">End Date</label>
+              <label className="block text-sm font-medium text-gray-700">Tanggal Akhir</label>
               <input
-                className="border border-gray-300 p-2 mr-2"
+                className="border border-gray-300 p-2 w-full md:w-auto"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
@@ -169,9 +187,9 @@ const DataOrderPage = () => {
             </div>
             <button
               onClick={handleDateFilter}
-              className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
+              className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg w-full md:w-auto"
             >
-              Filter by Date
+              Filter Tanggal
             </button>
           </div>
         </div>
@@ -184,16 +202,16 @@ const DataOrderPage = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Table Number
+                        Kode Order
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order Code
+                        Tanggal Order
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Total
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order Date
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
@@ -201,16 +219,16 @@ const DataOrderPage = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {groupedOrders.length > 0 ? (
-                      groupedOrders.map((order, index) => (
+                    {ordersWithTotal.length > 0 ? (
+                      ordersWithTotal.map((order, index) => (
                         <React.Fragment key={index}>
                           <tr>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.table_number}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.order_code}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getStatusName(order.status_id)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {formatDate(order.order_date)}
                             </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.total}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getStatusName(order.status_id)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <button
                                 onClick={() => toggleDetail(order.id)}
@@ -225,7 +243,7 @@ const DataOrderPage = () => {
                     ) : (
                       <tr>
                         <td colSpan="5" className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                          No data found.
+                          Data tidak ditemukan.
                         </td>
                       </tr>
                     )}
@@ -240,7 +258,7 @@ const DataOrderPage = () => {
       <DetailOrder
         isOpen={isModalOpen}
         onClose={closeModal}
-        order={groupedOrders.find((order) => order.id === detailOrderId)}
+        order={ordersWithTotal.find((order) => order.id === detailOrderId)}
       />
     </Layout>
   );

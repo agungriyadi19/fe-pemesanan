@@ -4,16 +4,17 @@ import axios from "axios";
 import Notification from "../../../components/Notification";
 import { Endpoints } from "../../../api";
 import DetailOrder from "../../../components/order/DetailOrder";
+import Swal from 'sweetalert2';
 
 const DataOrderPage = () => {
   const [orderData, setOrderData] = useState([]);
   const [statuses, setStatuses] = useState([]);
-  const [msg, setMsg] = useState(""); // Message for success or error
+  const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
-  const [filterOrderCode, setFilterOrderCode] = useState(""); // State for filtering by order code
-  const [filterStatus, setFilterStatus] = useState(""); // State for filtering by status
-  const [detailOrderId, setDetailOrderId] = useState(null); // State to manage detail visibility
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+  const [filterOrderCode, setFilterOrderCode] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [detailOrderId, setDetailOrderId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getData();
@@ -27,7 +28,7 @@ const DataOrderPage = () => {
         setOrderData(response.data.orders);
       }
     } catch (error) {
-      setMsg("Error fetching data");
+      setMsg("Gagal mengambil data");
       setIsError(true);
     }
   };
@@ -39,7 +40,7 @@ const DataOrderPage = () => {
         setStatuses(response.data.statuses);
       }
     } catch (error) {
-      setMsg("Error fetching statuses");
+      setMsg("Gagal mengambil status");
       setIsError(true);
     }
   };
@@ -47,26 +48,25 @@ const DataOrderPage = () => {
   const deleteOrder = async (orderId) => {
     try {
       await axios.delete(`${Endpoints.order}/${orderId}`);
-      setMsg("Order successfully deleted");
+      setMsg("Pesanan berhasil dihapus");
       setIsError(false);
-      getData(); // Refresh data after deletion
+      getData();
     } catch (error) {
-      setMsg("Failed to delete order");
+      setMsg("Gagal menghapus pesanan");
       setIsError(true);
     }
   };
 
   const getStatusName = (statusId) => {
     const status = statuses.find((status) => status.id === statusId);
-    return status ? status.name : "Unknown";
+    return status ? status.name : "Tidak Diketahui";
   };
 
   const formatDate = (dateString) => {
     const options = { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" };
-    return new Date(dateString).toLocaleDateString("en-GB", options);
+    return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  // Filter orderData based on filterOrderCode and filterStatus
   const filteredOrderData = orderData.filter((order) => {
     const orderCodeMatch = order.order_code.toLowerCase().includes(filterOrderCode.toLowerCase());
     const statusMatch = !filterStatus || order.status_id === parseInt(filterStatus);
@@ -83,7 +83,6 @@ const DataOrderPage = () => {
     setDetailOrderId(null);
   };
 
-  // Group order data by table number and order code
   const groupedOrderData = filteredOrderData.reduce((acc, order) => {
     const key = `${order.table_number}-${order.order_code}`;
     if (!acc[key]) {
@@ -108,27 +107,27 @@ const DataOrderPage = () => {
         <Notification message={msg} isError={isError} />
       </div>
       <div className="mt-5 container mx-auto px-4">
-        <h1 className="text-3xl font-semibold mb-3 text-center">Data Order</h1>
+        <h1 className="text-3xl font-semibold mb-3 text-center">Data Pesanan</h1>
 
         <div className="mt-4 mb-4 flex flex-col md:flex-row justify-between items-center">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Filter by Order Code</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Filter berdasarkan Kode Pesanan</label>
             <input
               className="border border-gray-300 p-2 mr-2"
               type="text"
-              placeholder="Order Code"
+              placeholder="Kode Pesanan"
               value={filterOrderCode}
               onChange={(e) => setFilterOrderCode(e.target.value)}
             />
           </div>
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Filter by Status</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Filter berdasarkan Status</label>
             <select
               className="border border-gray-300 p-2"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="">Select Status</option>
+              <option value="">Pilih Status</option>
               {statuses.map((status) => (
                 <option key={status.id} value={status.id}>
                   {status.name}
@@ -146,19 +145,19 @@ const DataOrderPage = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Table Number
+                        Nomor Meja
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order Code
+                        Kode Pesanan
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order Date
+                        Tanggal Pesanan
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+                        Aksi
                       </th>
                     </tr>
                   </thead>
@@ -175,31 +174,38 @@ const DataOrderPage = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <div className="flex items-center space-x-2">
-                                <a
-                                  href={`/order/edit/${order.id}`}
-                                  className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
-                                >
-                                  Edit
-                                </a>
-                                <button
-                                  onClick={() => {
-                                    if (
-                                      window.confirm(
-                                        "Are you sure you want to delete this order?"
-                                      )
-                                    ) {
-                                      deleteOrder(order.id);
-                                    }
-                                  }}
-                                  className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg"
-                                >
-                                  Delete
-                                </button>
                                 <button
                                   onClick={() => toggleDetail(order.id)}
                                   className="bg-yellow-500 hover:bg-yellow-700 text-white p-2 rounded-lg"
                                 >
                                   Detail
+                                </button>
+                                <a
+                                  href={`/order/edit/${order.id}`}
+                                  className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
+                                >
+                                  Ubah Status
+                                </a>
+                                <button
+                                  onClick={() => {
+                                    Swal.fire({
+                                      title: 'Apakah Anda yakin?',
+                                      text: "Anda tidak dapat membatalkan pesanan setelah dihapus!",
+                                      icon: 'warning',
+                                      showCancelButton: true,
+                                      confirmButtonColor: '#3085d6',
+                                      cancelButtonColor: '#d33',
+                                      confirmButtonText: 'Hapus',
+                                      cancelButtonText: 'Batal'
+                                    }).then((result) => {
+                                      if (result.isConfirmed) {
+                                        deleteOrder(order.id);
+                                      }
+                                    });
+                                  }}
+                                  className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg"
+                                >
+                                  Batalkan Pesanan
                                 </button>
                               </div>
                             </td>
@@ -209,7 +215,7 @@ const DataOrderPage = () => {
                     ) : (
                       <tr>
                         <td colSpan="5" className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                          No data found.
+                          Data tidak ditemukan.
                         </td>
                       </tr>
                     )}

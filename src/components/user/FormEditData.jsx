@@ -1,96 +1,114 @@
-/* eslint-disable */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import Notification from "../Notification";
 import { Endpoints } from "../../api";
+import Modal from "../Modal";
+import swal from 'sweetalert';
+import { readCookie } from '../../utils'; // Assuming you have a utility to read cookies
 
-const FormEditData = () => {
-  const { id } = useParams();
+const FormEditData = ({ isOpen, onClose, userId }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [roleID, setRoleID] = useState("");
   const [phone, setPhone] = useState("");
   const [roles, setRoles] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserAndRoles = async () => {
       try {
-        // Fetch user data by ID
-        const response = await axios.get(`${Endpoints.user}/${id}`);
-        const data = response.data.user;
-        if (data) {
-          setName(data.name);
-          setEmail(data.email);
-          setUsername(data.username);
-          setRoleID(data.role_id);
-          setPhone(data.phone);
+        const token = readCookie('token'); // Assuming you store the token in a cookie
+
+        // Check if the user is authenticated
+        if (token) {
+          setIsAuthenticated(true);
+
+          // Fetch user data by ID
+          const userResponse = await axios.get(`${Endpoints.user}/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          const data = userResponse.data.user;
+          if (data) {
+            setName(data.name);
+            setEmail(data.email);
+            setUsername(data.username);
+            setRoleID(data.role_id);
+            setPhone(data.phone);
+          }
+
+          // Fetch roles data
+          const rolesResponse = await axios.get(Endpoints.role, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          setRoles(rolesResponse.data.roles);
+        } else {
+          setIsAuthenticated(false);
+          swal("Error", "Pengguna tidak terautentikasi", "error");
         }
       } catch (error) {
-        setMsg("Error fetching data");
-        setIsError(true);
+        setIsAuthenticated(false);
+        swal("Error", "Gagal mendapatkan data", "error");
       }
     };
 
-    const fetchRoles = async () => {
-      try {
-        // Fetch roles data
-        const response = await axios.get(Endpoints.role);
-        const rolesData = response.data.roles;
-        setRoles(rolesData);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-
-    fetchData();
-    fetchRoles();
-  }, [id]);
+    if (userId) {
+      fetchUserAndRoles();
+    }
+  }, [userId]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      swal("Error", "Tidak terautentikasi", "error");
+      return;
+    }
+
     try {
+      const token = readCookie('token'); // Get the token for authentication
       const userData = {
         name,
         email,
         username,
-        role_id: roleID,
+        role_id: parseInt(roleID, 10),
         phone,
       };
 
       // Update user data
-      const response = await axios.put(`${Endpoints.user}/${id}`, userData);
+      await axios.put(`${Endpoints.user}/${userId}`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
-      setMsg("User successfully updated" + response);
-      setIsError(false);
+      swal("Berhasil", "Pengguna berhasil diperbarui", "success");
+      onClose(); // Close the modal on success
     } catch (error) {
-      setMsg("Failed to update user");
-      setIsError(true);
+      swal("Error", "Gagal memperbarui pengguna", "error");
     }
   };
 
+  if (!isOpen || !isAuthenticated) {
+    return null; // Return null if not authenticated or modal is not open
+  }
+
   return (
-    <div className="flex w-full justify-center items-center">
-      <div className="z-999">
-        <Notification message={msg} isError={isError} />
-      </div>
-      <div className="p-4 lg:w-1/2">
-        <form
-          onSubmit={handleFormSubmit}
-          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-        >
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="p-4 lg:w-full">
+        <h1 className="text-center font-bold">Edit Staff</h1>
+        <form onSubmit={handleFormSubmit} className="px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-              Name
+              Nama
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="name"
               type="text"
-              placeholder="Name"
+              placeholder="Nama"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -110,33 +128,33 @@ const FormEditData = () => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-              Username
+              Nama Pengguna
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="username"
               type="text"
-              placeholder="Username"
+              placeholder="Nama Pengguna"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
-              Phone
+              Telepon
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="phone"
               type="text"
-              placeholder="Phone"
+              placeholder="Telepon"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role_id">
-              Role
+              Peran
             </label>
             <select
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -144,7 +162,7 @@ const FormEditData = () => {
               value={roleID}
               onChange={(e) => setRoleID(e.target.value)}
             >
-              <option value="">Select Role</option>
+              <option value="">Pilih Peran</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name}
@@ -157,12 +175,12 @@ const FormEditData = () => {
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="submit"
             >
-              Edit User
+              Edit
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
 

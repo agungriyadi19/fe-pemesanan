@@ -10,15 +10,12 @@ const ModalKeranjang = ({
     handleClose,
     keranjangDetail,
     amount,
-    keterangan,
     tambah,
     kurang,
-    changeHandler,
     handleSubmit,
     totalHarga,
     hapusPesanan
 }) => {
-    console.log(keranjangDetail);
     if (keranjangDetail) {
         return (
             <Transition appear show={showModal} as={Fragment}>
@@ -78,20 +75,6 @@ const ModalKeranjang = ({
                                                         <FontAwesomeIcon icon={faPlus} />
                                                     </button>
                                                 </div>
-                                            </div>
-
-                                            <div className="mb-4">
-                                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                                    Keterangan:
-                                                </label>
-                                                <textarea
-                                                    className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none"
-                                                    rows="3"
-                                                    name="keterangan"
-                                                    placeholder="Contoh : Pedes, Nasi Setengah"
-                                                    value={keterangan}
-                                                    onChange={(event) => changeHandler(event)}
-                                                />
                                             </div>
                                         </div>
 

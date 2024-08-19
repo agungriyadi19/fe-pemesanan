@@ -1,11 +1,23 @@
 import React, { useState } from "react";
 import { FaBars } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { eraseCookie } from '../utils';
 
 const NavbarComponent = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
+
+  const handleLogout = async () => {
+    try {
+      eraseCookie('token');
+      eraseCookie('role');
+      navigate("/login"); 
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="font-montserrat">
@@ -42,7 +54,7 @@ const NavbarComponent = () => {
                   }`}
                   href="/order"
                 >
-                  <span className="ml-2">Home</span>
+                  <span className="ml-2">Dasbor</span>
                 </a>
               </li>
               <li className="nav-item">
@@ -62,7 +74,7 @@ const NavbarComponent = () => {
                   }`}
                   href="/user"
                 >
-                  <span className="ml-2">Data User</span>
+                  <span className="ml-2">Data Staff</span>
                 </a>
               </li>
               <li className="nav-item">
@@ -72,14 +84,19 @@ const NavbarComponent = () => {
                   }`}
                   href="/settings"
                 >
-                  <span className="ml-2">Setting</span>
+                  <span className="ml-2">Pengaturan</span>
                 </a>
               </li>
             </ul>
             <ul className="ml-auto">
               <li>
                 <div className="relative inline-block text-left">
-                  <button className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg">Keluar</button>
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg"
+                    onClick={handleLogout}
+                  >
+                    Keluar
+                  </button>
                 </div>
               </li>
             </ul>

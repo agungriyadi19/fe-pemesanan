@@ -5,12 +5,14 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
   if (!isOpen || !order) return null;
 
   const calculateTotal = () => {
+    console.log(order);
     return order.menus.reduce((acc, menu) => acc + menu.price * menu.amount, 0);
   };
 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
-      <div className="relative p-8 bg-white w-full max-w-md md:max-w-lg m-auto flex-col flex rounded-lg shadow-lg">
+      <div className="relative p-8 bg-white w-full max-w-xl md:max-w-2xl m-auto flex-col flex rounded-lg shadow-lg">
+
         <span
           className="absolute top-0 right-0 p-4 cursor-pointer"
           onClick={onClose}
@@ -35,6 +37,7 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -44,7 +47,8 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.price)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.amount)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.amount * menu.price)}</td>
-                  </tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{menu.status_name}</td>
+                    </tr>
                 ))}
               </tbody>
             </table>
@@ -64,6 +68,9 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
                 </div>
                 <div className="mb-2">
                   <span className="font-medium">Total: </span>{numberWithCommas(menu.amount * menu.price)}
+                </div>
+                <div className="mb-2">
+                  <span className="font-medium">Status: </span>{menu.status_name}
                 </div>
               </div>
             ))}

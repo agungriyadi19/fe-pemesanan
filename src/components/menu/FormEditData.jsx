@@ -1,12 +1,11 @@
-/* eslint-disable */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import Notification from "../Notification";
 import { Endpoints, apiURl } from "../../api";
+import Modal from "../Modal";
+import swal from 'sweetalert';
+import { readCookie } from '../../utils'; // Assuming you have a utility to read cookies
 
-const FormEditData = () => {
-  const { id } = useParams();
+const FormEditData = ({ isOpen, onClose, menuId, refreshData }) => {
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -14,57 +13,83 @@ const FormEditData = () => {
   const [price, setPrice] = useState("");
   const [category_id, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
-  const [msg, setMsg] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMenuAndCategories = async () => {
       try {
-        // Fetch menu data by ID
-        const response = await axios.get(`${Endpoints.menu}/${id}`);
-        const data = response.data.menu;
-        if (data) {
-          setName(data.name);
-          setImageUrl(`${apiURl}/${data.image}`); // Set URL for image preview
-          setDescription(data.description);
-          setPrice(data.price.toString());
-          setCategoryId(data.category_id.toString());
+        const token = readCookie('token'); // Assuming you store the token in a cookie
+
+        // Check if the user is authenticated
+        if (token) {
+          setIsAuthenticated(true);
+
+          // Fetch menu data by ID
+          const menuResponse = await axios.get(`${Endpoints.menu}/${menuId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          const data = menuResponse.data.menu;
+          if (data) {
+            setName(data.name);
+            setImageUrl(`${apiURl}/${data.image}`); // Set URL for image preview
+            setDescription(data.description);
+            setPrice(data.price.toString());
+            setCategoryId(data.category_id.toString());
+          }
+
+          // Fetch categories data
+          const categoriesResponse = await axios.get(Endpoints.category, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          setCategories(categoriesResponse.data.categories);
+        } else {
+          setIsAuthenticated(false);
+          swal("Error", "User not authenticated", "error");
         }
       } catch (error) {
-        setMsg("Error fetching data");
-        setIsError(true);
+        setIsAuthenticated(false);
+        swal("Error", "Error fetching data", "error");
       }
     };
 
-    const fetchCategories = async () => {
-      try {
-        // Fetch categories data
-        const response = await axios.get(Endpoints.category);
-        const categoriesData = response.data.categories;
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
+    if (menuId) {
+      fetchMenuAndCategories();
+    }
+  }, [menuId]);
 
-    fetchData();
-    fetchCategories();
-  }, [id]);
+  // Function to convert file to base64 string
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   // Function to handle file input change
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      const base64 = await fileToBase64(selectedFile);
       setImage(selectedFile);
-      setImageUrl(URL.createObjectURL(selectedFile)); // Update imageUrl for preview
+      setImageUrl(base64); // Update imageUrl for preview
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      swal("Error", "Not authenticated", "error");
+      return;
+    }
+
     try {
-      const responseGet = await axios.get(`${Endpoints.menu}/${id}`);
-      const data = responseGet.data.menu;
+      const token = readCookie('token'); // Get the token for authentication
 
       const formData = new FormData();
       formData.append("name", name);
@@ -77,36 +102,34 @@ const FormEditData = () => {
         formData.append("image", image);
       } else {
         // Use previous image if no new image selected
-        formData.append("image", imageUrl.replace(`${apiURl}/${data.image}`, ""));
+        formData.append("image", imageUrl.replace(`${apiURl}/`, ""));
       }
 
       // Update menu data
-      await axios.put(`${Endpoints.menu}/${id}`, formData, {
+      await axios.put(`${Endpoints.menu}/${menuId}`, formData, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
-        },
+        }
       });
 
-      setMsg("Data successfully updated");
-      setIsError(false);
+      swal("Success", "Menu successfully updated", "success");
+      refreshData();
+      onClose(); // Close the modal on success
     } catch (error) {
-      setMsg("Failed to update data");
-      setIsError(true);
+      swal("Error", "Failed to update menu", "error");
     }
   };
 
+  if (!isOpen || !isAuthenticated) {
+    return null; // Return null if not authenticated or modal is not open
+  }
 
   return (
-    <div className="flex w-full justify-center items-center">
-      <div className="z-999">
-        <Notification message={msg} isError={isError} />
-      </div>
-      <div className="p-4 lg:w-1/2">
-        <form
-          onSubmit={handleFormSubmit}
-          encType="multipart/form-data"
-          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-        >
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="p-4 lg:w-full max-h-[90vh] overflow-auto">
+        <h1 className="text-center font-bold">Edit Menu</h1>
+        <form onSubmit={handleFormSubmit} encType="multipart/form-data" className="px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
               Name
@@ -140,13 +163,14 @@ const FormEditData = () => {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
               Description
             </label>
-            <input
+            <textarea
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="description"
               type="text"
               placeholder="Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              rows="3"
             />
           </div>
           <div className="mb-6">
@@ -184,12 +208,12 @@ const FormEditData = () => {
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="submit"
             >
-              Edit Data
+              Edit
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
 

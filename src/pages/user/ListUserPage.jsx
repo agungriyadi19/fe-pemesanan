@@ -1,16 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
-import Notification from "../../components/Notification";
+import Swal from 'sweetalert2';
 import { Endpoints } from "../../api";
+import { readCookie } from '../../utils';
+import FormTambahData from "../../components/user/FormTambahData";
+import FormEditData from "../../components/user/FormEditData";
 
 const DataUserPage = () => {
   const [userData, setUserData] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [msg, setMsg] = useState(""); // Message for success or error
-  const [isError, setIsError] = useState(false);
-  const [filterName, setFilterName] = useState(""); // State for filtering by name
-  const [filterRole, setFilterRole] = useState(""); // State for filtering by role
+  const [filterName, setFilterName] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
+
+  const openAddModal = () => setIsAddModalOpen(true);
+  const closeAddModal = () => setIsAddModalOpen(false);
+
+  const openEditModal = (userId) => {
+    setEditUserId(userId);
+    setIsEditModalOpen(true);
+  };
+  const closeEditModal = () => {
+    setEditUserId(null);
+    setIsEditModalOpen(false);
+  };
 
   useEffect(() => {
     getData();
@@ -18,71 +34,99 @@ const DataUserPage = () => {
   }, []);
 
   const getData = async () => {
+    const token = readCookie('token');
     try {
-      const response = await axios.get(Endpoints.user);
+      const response = await axios.get(Endpoints.user, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (response.data.users && response.data.users.length >= 0) {
         setUserData(response.data.users);
       }
     } catch (error) {
-      setMsg("Error fetching data");
-      setIsError(true);
+      Swal.fire("Error", "Terjadi kesalahan saat mengambil data", "error");
     }
   };
 
   const getRoles = async () => {
+    const token = readCookie('token');
     try {
-      const response = await axios.get(Endpoints.role);
+      const response = await axios.get(Endpoints.role, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (response.data.roles && response.data.roles.length >= 0) {
         setRoles(response.data.roles);
       }
     } catch (error) {
-      setMsg("Error fetching roles");
-      setIsError(true);
+      Swal.fire("Error", "Terjadi kesalahan saat mengambil peran", "error");
     }
   };
 
   const deleteUser = async (userId) => {
+    const token = readCookie('token');
     try {
-      await axios.delete(`${Endpoints.user}/${userId}`);
-      setMsg("User successfully deleted");
-      setIsError(false);
-      getData(); // Refresh data after deletion
+      await axios.delete(`${Endpoints.user}/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      Swal.fire("Success", "Pengguna berhasil dihapus", "success");
+      getData();
     } catch (error) {
-      console.log(error);
-      setMsg("Failed to delete user");
-      setIsError(true);
+      Swal.fire("Error", "Gagal menghapus pengguna", "error");
+    }
+  };
+
+  const handleDelete = async (userId) => {
+    const result = await Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: "Data pengguna ini akan dihapus!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, hapus!'
+    });
+
+    if (result.isConfirmed) {
+      deleteUser(userId);
+      Swal.fire(
+        'Terhapus!',
+        'Pengguna telah dihapus.',
+        'success'
+      );
     }
   };
 
   const getRoleName = (roleId) => {
-    console.log(roles);
-    console.log(roleId);
     const getRole = roles.find((role) => role.id === roleId);
-    console.log(getRole);
-    return getRole ? getRole.name : "Unknown";
+    return getRole ? getRole.name : "Tidak Dikenal";
   };
 
-  // Filter userData based on filterName and filterRole
   const filteredUserData = userData.filter((user) => {
     const nameMatch = user.name.toLowerCase().includes(filterName.toLowerCase());
     const roleMatch = !filterRole || user.role_id === parseInt(filterRole);
     return nameMatch && roleMatch;
   });
 
+  const handleDataChange = async () => {
+    await getData(); // Refresh data
+  };
+
   return (
     <Layout>
-      <div className="z-999">
-        <Notification message={msg} isError={isError} />
-      </div>
       <div className="mt-5 container mx-auto">
-        <h1 className="text-3xl font-semibold mb-3 text-center">Data User</h1>
+        <h1 className="text-3xl font-semibold mb-3 text-center">Data Staff</h1>
 
         <div className="mt-4 mb-4 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <input
               className="border border-gray-300 p-2 mr-2"
               type="text"
-              placeholder="Filter by Name"
+              placeholder="Filter berdasarkan Nama"
               value={filterName}
               onChange={(e) => setFilterName(e.target.value)}
             />
@@ -91,7 +135,7 @@ const DataUserPage = () => {
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
             >
-              <option value="">Filter by Role</option>
+              <option value="">Filter berdasarkan Peran</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name}
@@ -101,12 +145,12 @@ const DataUserPage = () => {
           </div>
 
           <div>
-            <a
+            <button
               className="bg-green-500 hover:bg-green-700 text-white p-2 rounded-lg"
-              href="/user/add"
+              onClick={openAddModal}
             >
-              Add User
-            </a>
+              Tambah Staff
+            </button>
           </div>
         </div>
 
@@ -118,7 +162,7 @@ const DataUserPage = () => {
                   No
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                  Nama
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
@@ -127,13 +171,13 @@ const DataUserPage = () => {
                   Username
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Phone
+                  Telepon
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
+                  Peran
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Action
+                  Aksi
                 </th>
               </tr>
             </thead>
@@ -161,25 +205,17 @@ const DataUserPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center space-x-2">
-                        <a
-                          href={`/user/edit/${user.id}`}
+                        <button
+                          onClick={() => openEditModal(user.id)}
                           className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
                         >
                           Edit
-                        </a>
+                        </button>
                         <button
-                          onClick={() => {
-                            if (
-                              window.confirm(
-                                "Are you sure you want to delete this user?"
-                              )
-                            ) {
-                              deleteUser(user.id);
-                            }
-                          }}
+                          onClick={() => handleDelete(user.id)}
                           className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg"
                         >
-                          Delete
+                          Hapus
                         </button>
                       </div>
                     </td>
@@ -188,7 +224,7 @@ const DataUserPage = () => {
               ) : (
                 <tr>
                   <td colSpan="7" className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                    No data found.
+                    Data tidak ditemukan.
                   </td>
                 </tr>
               )}
@@ -196,7 +232,13 @@ const DataUserPage = () => {
           </table>
         </div>
       </div>
+
+      <FormTambahData isOpen={isAddModalOpen} onClose={closeAddModal} onDataChange={handleDataChange} />
+      {isEditModalOpen && (
+        <FormEditData isOpen={isEditModalOpen} onClose={closeEditModal} userId={editUserId} onDataChange={handleDataChange} />
+      )}
     </Layout>
+    
   );
 };
 

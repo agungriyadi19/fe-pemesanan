@@ -53,8 +53,8 @@ export default class TotalBayar extends Component {
                                     className="w-full bg-blue-500 text-white text-lg py-2 rounded-md flex items-center justify-center"
                                     onClick={() => this.submitTotalBayar(totalBayar)}
                                 >
-                                    <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
-                                    <strong>Bayar</strong>
+                                    {/* <FontAwesomeIcon icon={faShoppingCart} className="mr-2" /> */}
+                                    <strong>Pesan</strong>
                                 </button>
                             </div>
                         </div>

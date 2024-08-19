@@ -1,4 +1,5 @@
+import Scan from './Scan'
 import Home from './Home'
-import Sukses from './Sukses'
+import Riwayat from './Riwayat'
 
-export { Home, Sukses }
+export { Scan, Home, Riwayat }

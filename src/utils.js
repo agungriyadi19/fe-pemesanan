@@ -1,14 +1,32 @@
-export const createCookie = (cookieName, cookieValue, hourToExpire,) => {
-  const date = new Date()
-  date.setTime(date.getTime() + hourToExpire * 60 * 60 * 1000,)
-  document.cookie = `${cookieName} = ${cookieValue}; expires = ${date.toGMTString()}`
-}
 
-export const deleteCookie = (name,) =>
-  (document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;')
+export const createCookie = (name, value, days) => {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+};
+
+// Function to get a cookie value
+export const readCookie = (name) => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (const element of ca) {
+    let c = element;
+    while (c.startsWith(' ')) c = c.substring(1, c.length);
+    if (c.startsWith(nameEQ)) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+};
+
+// Function to erase a cookie
+export const eraseCookie = (name) => {
+  document.cookie = name + '=; Max-Age=-99999999;';
+};
 
 export const numberWithCommas = (x) => {
-  console.log(x);
   if (x === undefined || x === null) {
     return "";
   }

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Endpoints } from "../../api"; 
 
-export default class Sukses extends Component {
+export default class Riwayat extends Component {
     componentDidMount() {
         axios
             .get(Endpoints.order)
@@ -26,7 +26,7 @@ export default class Sukses extends Component {
     render() {
         return (
             <div className="mt-4 text-center">
-                <Image src="assets/images/sukses.png" width="500" />
+                <Image src="assets/images/Riwayat.png" width="500" />
                 <h2>Sukses Pesan</h2>
                 <p>Terimakasih Sudah Memesan!</p>
                 <Button variant="primary" as={Link} to="/">

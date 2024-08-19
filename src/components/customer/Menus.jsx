@@ -8,6 +8,7 @@ const Menus = ({ menu, masukKeranjang }) => {
                 <img src={`data:image/png;base64,${menu.image}`} alt={menu.name} className="w-full h-56 object-cover" />
                 <div className="p-4">
                     <h5 className="text-lg font-bold">{menu.name}</h5>
+                    <p className="text-gray-700">{menu.description}</p>
                     <p className="text-gray-700">Rp. {numberWithCommas(menu.price)}</p>
                 </div>
             </div>

@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { Endpoints } from "../api";
 import { createCookie } from "../utils";
+import { useNavigate } from "react-router-dom";
 
-const Login = ({ history }) => {
+const Login = () => {
   const [login, setLogin] = useState({
     email: "",
     password: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate(); // Use navigate instead of history
 
   const { email, password } = login;
 
@@ -25,16 +28,37 @@ const Login = ({ history }) => {
         password,
       });
 
-      const { token, success, user } = response.data;
+      const { token, success, user, errors } = response.data;
       if (success) {
-        // creating a cookie expire in 30 minutes (same time as the token is invalidated on the backend)
-        createCookie("token", token, 0.5);
-        history.push({ pathname: "/session", state: user });
+        createCookie("token", token, 0.5); // Save token to cookie
+        createCookie("role", user.role_id, 0.5); // Save token to cookie
+        if (user.role_id === 1) { // Admin role
+          navigate("/order");
+        } else if (user.role_id === 2) { // Cashier role
+          navigate("/cashier");
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Role Tidak Terdaftar',
+            text: 'Akun Anda tidak memiliki akses ke halaman ini.',
+            confirmButtonColor: '#d33',
+          });
+        }
       } else {
-        // setErrors(errors);
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Gagal',
+          text: errors.join(', '),
+          confirmButtonColor: '#d33',
+        });
       }
     } catch (e) {
-      // setErrors([e.toString()]);
+      Swal.fire({
+        icon: 'error',
+        title: 'Terjadi Kesalahan',
+        text: 'Terjadi kesalahan saat mencoba masuk. Silakan coba lagi.',
+        confirmButtonColor: '#d33',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -44,7 +68,7 @@ const Login = ({ history }) => {
     <form onSubmit={handleSubmit}>
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full sm:w-1/2 lg:w-1/3">
-          <h1 className="text-2xl mb-4 text-center">Login</h1>
+          <h1 className="text-2xl mb-4 text-center">Masuk</h1>
 
           <div className="mb-4">
             <label
@@ -70,13 +94,13 @@ const Login = ({ history }) => {
               htmlFor="password"
               className="block text-gray-700 text-sm font-bold mb-2"
             >
-              Password
+              Kata Sandi
             </label>
             <input
               id="password"
               className="input-field border-b-2 border-gray-400 py-2 px-3 w-full focus:outline-none focus:border-blue-500"
               type="password"
-              placeholder="Password"
+              placeholder="Kata Sandi"
               value={password}
               name="password"
               onChange={handleChange}
@@ -89,7 +113,7 @@ const Login = ({ history }) => {
             disabled={isSubmitting}
             type="submit"
           >
-            {isSubmitting ? "Logging in..." : "Login"}
+            {isSubmitting ? "Sedang Masuk..." : "Masuk"}
           </button>
 
         </div>

@@ -5,6 +5,7 @@ import TotalBayar from './TotalBayar'
 import axios from 'axios'
 import { Endpoints } from "../../api";
 import swal from 'sweetalert'
+import Cookies from 'js-cookie';
 
 export default class Hasil extends Component {
   constructor(props) {
@@ -12,9 +13,8 @@ export default class Hasil extends Component {
 
     this.state = {
       showModal: false,
-      keranjangDetail: false,
+      keranjangDetail: null,
       amount: 0,
-      keterangan: '',
       totalHarga: 0,
     }
   }
@@ -24,7 +24,6 @@ export default class Hasil extends Component {
       showModal: true,
       keranjangDetail: menuKeranjang,
       amount: menuKeranjang.amount,
-      keterangan: menuKeranjang.keterangan,
       totalHarga: menuKeranjang.total_price
     })
   }
@@ -53,24 +52,26 @@ export default class Hasil extends Component {
     }
   };
 
-  changeHandler = (event) => {
-    this.setState({
-      keterangan: event.target.value,
-    });
-  };
-
   handleSubmit = (event) => {
     event.preventDefault();
 
     this.handleClose();
 
+    const table_number = Cookies.get('table_number');
+    const order_code = Cookies.get('order_code');
+
+    console.log(this.state.keranjangDetail);
+    
     const data = {
       amount: this.state.amount,
-      keterangan: this.state.keterangan,
-    };
+      table_number: table_number,
+      order_code: order_code, // Optional if you want to update order_code
+      menu_id: this.state.keranjangDetail.menu_id // Optional if you want to update menu_id
+  };
+
 
     axios
-      .put(Endpoints.order + this.state.keranjangDetail.id, data)
+      .put(Endpoints.order +"/"+ this.state.keranjangDetail.id, data)
       .then((res) => {
         this.props.getListKeranjang();
         swal({
@@ -90,7 +91,7 @@ export default class Hasil extends Component {
     this.handleClose();
 
     axios
-      .delete(Endpoints.order + id)
+      .delete(Endpoints.order +"/" + id)
       .then((res) => {
         this.props.getListKeranjang()
         swal({
@@ -146,7 +147,6 @@ export default class Hasil extends Component {
           {...this.state}
           tambah={this.tambah}
           kurang={this.kurang}
-          changeHandler={this.changeHandler}
           handleSubmit={this.handleSubmit}
           hapusPesanan={this.hapusPesanan}
         />

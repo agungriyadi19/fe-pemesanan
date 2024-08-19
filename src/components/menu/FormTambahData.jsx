@@ -1,177 +1,179 @@
-/* eslint-disable */
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Notification from "../Notification";
-import { Endpoints } from "../../api";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import swal from 'sweetalert';
+import Modal from '../Modal';
+import { Endpoints } from '../../api';
+import { readCookie } from '../../utils'; // Mengimpor fungsi readCookie
 
-function FormTambahData() {
-  const [name, setName] = useState("");
+const FormTambahData = ({ isOpen, onClose, menuData, refreshData }) => {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [categoryID, setCategoryID] = useState("");
   const [categories, setCategories] = useState([]);
-  const [msg, setMsg] = useState(""); // For storing success or error messages
-  const [isError, setIsError] = useState(false);
+  const [imagePreview, setImagePreview] = useState('');
 
   useEffect(() => {
-    // Fetch categories from API
     const fetchCategories = async () => {
       try {
         const response = await axios.get(Endpoints.category);
-        setCategories(response.data.categories);
+        setCategories(response.data.categories || []);
       } catch (error) {
-        console.error("Failed to fetch categories:", error);
+        console.error('Gagal mendapatkan data kategori:', error);
       }
     };
 
     fetchCategories();
   }, []);
 
-  const saveMenu = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("image", image);
-    formData.append("description", description);
-    formData.append("price", parseFloat(price));
-    formData.append("category_id", parseInt(categoryID));
-
-    try {
-      await axios.post(Endpoints.menu, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setMsg("Data Berhasil Ditambah");
-      setIsError(false);
-    } catch (error) {
-      if (error.response) {
-        setMsg("Data Gagal Ditambah");
-        setIsError(true);
-      }
+  useEffect(() => {
+    if (isOpen) {
+      // Reset form ketika modal dibuka
+      setName(menuData ? menuData.name : '');
+      setDescription(menuData ? menuData.description : '');
+      setPrice(menuData ? menuData.price : '');
+      setCategory(menuData ? menuData.category_id : '');
+      setImage(null);
+      setImagePreview(menuData ? menuData.image_url : '');
     }
-  };
+  }, [isOpen, menuData]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file));
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('category_id', category);
+    if (image) {
+      formData.append('image', image);
+    }
+
+    const token = readCookie('token'); // Mengambil token dari cookie
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`, // Menambahkan header Authorization
+        'Content-Type': 'multipart/form-data', // Untuk mengirim form data
+      },
+    };
+
+    try {
+      if (menuData) {
+        await axios.put(`${Endpoints.menu}/${menuData.id}`, formData, config);
+      } else {
+        await axios.post(Endpoints.menu, formData, config);
+      }
+      swal('Berhasil', 'Menu berhasil disimpan', 'success');
+      refreshData();
+      onClose();
+    } catch (error) {
+      swal('Error', 'Gagal menyimpan menu', 'error');
     }
   };
 
   return (
-    <div className="flex w-full justify-center items-center">
-      <div className="z-999">
-        <Notification message={msg} isError={isError} />
-      </div>
-      <div className="p-4 lg:w-1/2">
-        <form
-          onSubmit={saveMenu}
-          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-        >
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="p-4 lg:w-full max-h-[90vh] overflow-auto">
+        <h1 className="text-center font-bold text-xl mb-4">
+          {menuData ? 'Ubah Menu' : 'Tambah Menu'}
+        </h1>
+        <form onSubmit={handleSubmit} className="px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
-            >
-              Name
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              Nama Menu
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="name"
               type="text"
-              placeholder="Name"
+              placeholder="Nama Menu"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="image"
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+              Deskripsi
+            </label>
+            <textarea
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="description"
+              placeholder="Deskripsi Menu"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows="3"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
+              Harga
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="price"
+              type="number"
+              placeholder="Harga Menu"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+              Kategori
+            </label>
+            <select
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
             >
-              Image
+              <option value="">Pilih Kategori</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
+              Gambar Menu
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="image"
               type="file"
-              accept="image/*"
               onChange={handleImageChange}
+              accept="image/*"
             />
             {imagePreview && (
-              <img src={imagePreview} alt="Image Preview" className="mt-2 h-32" />
+              <div className="mt-4">
+                <img src={imagePreview} alt="Preview" className="w-full h-auto rounded-md" />
+              </div>
             )}
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="description"
-              type="text"
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="price"
-            >
-              Price
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="price"
-              type="text"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="categoryID"
-            >
-              Category
-            </label>
-            <select
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="categoryID"
-              value={categoryID}
-              onChange={(e) => setCategoryID(e.target.value)}
-            >
-              <option value="">Select Category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
           </div>
           <div className="flex items-center justify-between">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="submit"
             >
-              Tambah Data
+              {menuData ? 'Simpan Perubahan' : 'Tambah'}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
-}
+};
 
 export default FormTambahData;
