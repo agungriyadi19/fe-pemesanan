@@ -110,12 +110,13 @@ export default class Hasil extends Component {
 
   render() {
     const { keranjangs } = this.props
+    console.log(keranjangs);
     
     return (
       <div className="">
         <h4 className="font-bold">Hasil</h4>
         <hr className="my-2" />
-        {keranjangs.length !== 0 && (
+        { keranjangs != null && (
           <div className="overflow-auto h-64 bg-white shadow-md rounded-md">
             <ul className="divide-y divide-gray-200">
               {keranjangs.map((menuKeranjang) => (

@@ -9,9 +9,16 @@ export default class TotalBayar extends Component {
     };
 
     render() {
-        const totalBayar = this.props.keranjangs.reduce((result, item) => {
-            return result + item.total_price;
-        }, 0);
+        let totalBayar
+        if (this.props.keranjangs && this.props.keranjangs.length > 0) {
+            totalBayar = this.props.keranjangs.reduce((result, item) => {
+                return result + item.total_price;
+            }, 0);
+            console.log("Total Bayar:", totalBayar);
+        } else {
+            totalBayar = 0
+            console.log("Keranjangs is null or empty");
+        }
 
         return (
             <>
