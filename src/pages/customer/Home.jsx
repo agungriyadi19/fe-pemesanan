@@ -36,11 +36,11 @@ export default class Home extends Component {
     getListKeranjang = () => {
         const orderCode = Cookies.get('order_code');
         axios
-            .get(Endpoints.order+"/"+orderCode)
+            .get(Endpoints.order + "/" + orderCode)
             .then(res => {
                 const keranjang = res.data.orders;
                 const keranjangs = keranjang.filter(order => order.status_id === 1);
-    
+
                 this.setState({ keranjangs });
             })
             .catch(error => {
@@ -96,27 +96,27 @@ export default class Home extends Component {
             });
     };
 
-    checkActiveOrder = () => {
+    checkCodeOrder = () => {
         // Retrieve data from cookies
-        const tableNumber = Cookies.get('table_number'); // Replace with actual cookie name if different
+        const tableNumber = Number(Cookies.get('table_number')); // Replace with actual cookie name if different
         const orderCode = Cookies.get('order_code'); // Replace with actual cookie name if different
 
         if (!tableNumber || !orderCode) {
             // Handle missing cookie data, if necessary
-            return;
+            window.location.href = '/';
         }
 
         axios
-            .post(Endpoints.checkActive, { table_number: tableNumber, order_code: orderCode })
+            .post(Endpoints.checkCode, { table_number: tableNumber, order_code: orderCode })
             .then(res => {
                 const { active } = res.data;
                 if (!active) {
                     // Remove cookies
                     Cookies.remove('table_number');
                     Cookies.remove('order_code');
-                    
+
                     // Redirect to homepage if order is not active
-                    this.props.history.push('/');
+                    window.location.href = '/';
                 }
             })
             .catch(error => {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Endpoints } from "../../api";
@@ -5,8 +6,10 @@ import Cookies from 'js-cookie';
 import { NavComponents } from '../../components/customer';
 import { numberWithCommas } from '../../utils';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Icons for status
+import { useNavigate } from 'react-router-dom';
 
 const Riwayat = () => {
+    const navigate = useNavigate();
     const [keranjangs, setKeranjangs] = useState([]);
     const [total, setTotal] = useState(0);
 
@@ -31,6 +34,7 @@ const Riwayat = () => {
 
     useEffect(() => {
         getListKeranjang();
+        checkCodeOrder();
     }, [getListKeranjang]);
 
     const calculateTotal = (keranjangs) => {
@@ -40,12 +44,40 @@ const Riwayat = () => {
         setTotal(total);
     };
 
+    const checkCodeOrder = useCallback(() => {
+        // Retrieve data from cookies
+        const tableNumber = Number(Cookies.get('table_number')); // Replace with actual cookie name if different
+        const orderCode = Cookies.get('order_code'); // Replace with actual cookie name if different
+
+        if (!tableNumber || !orderCode) {
+            // Handle missing cookie data, if necessary
+            navigate("/")
+        }
+
+        axios
+            .post(Endpoints.checkCode, { table_number: tableNumber, order_code: orderCode })
+            .then(res => {
+                const { active } = res.data;
+                if (!active) {
+                    // Remove cookies
+                    Cookies.remove('table_number');
+                    Cookies.remove('order_code');
+
+                    // Redirect to homepage if order is not active
+                    navigate("/")
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
     return (
         <div className="bg-gray-50 min-h-screen">
             <NavComponents />
             <div className="container mx-auto p-4">
                 <h3 className="text-2xl font-bold text-gray-800 mb-4">Order Details</h3>
-                
+
                 {keranjangs.length > 0 && (
                     <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
                         <p className="text-gray-600"><span className="font-semibold">Order Code:</span> {keranjangs[0].order_code}</p>
@@ -58,8 +90,8 @@ const Riwayat = () => {
                         <thead className="bg-indigo-600 text-white">
                             <tr>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Menu</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Price</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Amount</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Harga</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Jumlah</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Total</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Status</th>
                             </tr>
@@ -95,16 +127,16 @@ const Riwayat = () => {
                                 <span className="font-semibold text-gray-800">Menu:</span> {order.menu.name}
                             </div>
                             <div className="mb-2">
-                                <span className="font-semibold text-gray-800">Price:</span> {numberWithCommas(order.menu.price)}
+                                <span className="font-semibold text-gray-800">Harga:</span> {numberWithCommas(order.menu.price)}
                             </div>
                             <div className="mb-2">
-                                <span className="font-semibold text-gray-800">Amount:</span> {order.amount}
+                                <span className="font-semibold text-gray-800">Jumlah:</span> {order.amount}
                             </div>
                             <div className="mb-2">
                                 <span className="font-semibold text-gray-800">Total:</span> {numberWithCommas(order.amount * order.menu.price)}
                             </div>
                             <div className="mb-2">
-                                <span className="font-semibold text-gray-800">Status:</span> 
+                                <span className="font-semibold text-gray-800">Status:</span>
                                 {order.status_name === 'menunggu konfirmasi' ? (
                                     <span className="text-yellow-500 flex items-center">
                                         <FaCheckCircle className="mr-2" /> {order.status_name}
