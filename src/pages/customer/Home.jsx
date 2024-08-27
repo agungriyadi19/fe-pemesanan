@@ -26,7 +26,6 @@ export default class Home extends Component {
             .get(Endpoints.menu + '?id=' + this.state.dipilih)
             .then(res => {
                 const menus = res.data.menus;
-                console.log(menus);
                 this.setState({ menus });
             })
             .catch(error => {
@@ -39,8 +38,9 @@ export default class Home extends Component {
         axios
             .get(Endpoints.order+"/"+orderCode)
             .then(res => {
-                const keranjangs = res.data.orders;
-                console.log(keranjangs);
+                const keranjang = res.data.orders;
+                const keranjangs = keranjang.filter(order => order.status_id === 1);
+    
                 this.setState({ keranjangs });
             })
             .catch(error => {

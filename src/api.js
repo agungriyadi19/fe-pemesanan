@@ -1,3 +1,4 @@
+// export const apiURl = 'http://localhost:8081'
 export const apiURl = 'https://inevitable-imogen-studenttest-64f4521b.koyeb.app'
 
 export const Endpoints = {
@@ -12,5 +13,5 @@ export const Endpoints = {
   status: `${apiURl}/api/statuses`,
   setting: `${apiURl}/api/settings`,
   scan: `${apiURl}/api/customer/check-radius`,
-  insertCode: `${apiURl}/api/customer/insert-code`,
+  checkCode: `${apiURl}/api/customer/check-code`,
 }

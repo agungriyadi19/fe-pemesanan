@@ -29,9 +29,9 @@ const InsertCodeModal = ({ isOpen, onRequestClose }) => {
                 return;
             }
 
-            await axios.post(Endpoints.insertCode, {
+            await axios.post(Endpoints.checkCode, {
                 order_code: code,
-                table_number: table,
+                table_number: Number(table),
             });
 
             Swal.fire({
@@ -39,14 +39,16 @@ const InsertCodeModal = ({ isOpen, onRequestClose }) => {
                 title: 'Sukses',
                 text: 'Order Kode berhasil disimpan',
             });
-            navigate('/menu');
+            Cookies.set('order_code', code);
+            navigate('/customer');
             onRequestClose(); // Close the modal after successful submission
         } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: error.response?.data?.error || 'Terjadi kesalahan',
-            });
+                confirmButtonColor: '#d33',
+        });
         }
     };
 

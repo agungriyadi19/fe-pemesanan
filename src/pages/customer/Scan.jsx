@@ -70,9 +70,9 @@ const Scan = () => {
                     // Handle successful response if needed
                 }
             } catch (error) {
-                console.log(error.response);
                 
                 if (error.response.data.error === "Meja sudah memiliki kode pesanan aktif") {
+                    Cookies.set('table_number', table_number);
                     setErrorMessage(error.response.data.error);
                     setIsModalOpen(true);
                 } else{

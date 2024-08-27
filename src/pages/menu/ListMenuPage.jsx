@@ -79,7 +79,7 @@ const ListMenuPage = () => {
   return (
     <Layout>
       <div className="mt-5 container mx-auto p-4">
-        <h1 className="text-3xl font-semibold mb-3 text-center">Daftar Menu</h1>
+        <h1 className="text-3xl font-semibold mb-3 text-center">Data Menu</h1>
         <div className="flex justify-between mb-4 items-center">
           <div className="flex space-x-2">
             <input

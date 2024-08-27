@@ -1,22 +1,14 @@
 import React from 'react';
 import { numberWithCommas } from '../../utils'
 
-const DetailOrder = ({ isOpen, onClose, order }) => {
+const Riwayat = ({ isOpen, onClose, order }) => {
   if (!isOpen || !order) return null;
 
   const calculateTotal = () => {
+    console.log(order);
     return order.menus.reduce((acc, menu) => acc + menu.price * menu.amount, 0);
   };
 
-  function getStatusColor(statusId) {
-    switch (statusId) {
-      case 5: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800'; // Menunggu Konfirmasi
-      case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
-      case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
-      case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
-      default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
-    }
-  }
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
       <div className="relative p-8 bg-white w-full max-w-xl md:max-w-2xl m-auto flex-col flex rounded-lg shadow-lg">
@@ -55,11 +47,7 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.price)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.amount)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.amount * menu.price)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    <span className={`${getStatusColor(order.status_id)}`}>
-                    {menu.status_name}
-                    </span>
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{menu.status_name}</td>
                     </tr>
                 ))}
               </tbody>
@@ -97,4 +85,4 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
   );
 };
 
-export default DetailOrder;
+export default Riwayat;

@@ -24,9 +24,7 @@ const DataOrderPage = () => {
   const getData = async () => {
     try {
       const response = await axios.get(Endpoints.order);
-      if (response.data.orders && response.data.orders.length >= 0) {
-        setOrderData(response.data.orders);
-      }
+      setOrderData(response.data.orders || []);
     } catch (error) {
       setMsg("Gagal mengambil data");
       setIsError(true);
@@ -36,31 +34,111 @@ const DataOrderPage = () => {
   const getStatuses = async () => {
     try {
       const response = await axios.get(Endpoints.status);
-      if (response.data.statuses && response.data.statuses.length >= 0) {
-        setStatuses(response.data.statuses);
-      }
+      setStatuses(response.data.statuses.filter(status => status.name !== 'Prapesan') || []);
     } catch (error) {
       setMsg("Gagal mengambil status");
       setIsError(true);
     }
   };
 
-  const deleteOrder = async (orderId) => {
-    try {
-      await axios.delete(`${Endpoints.order}/${orderId}`);
-      setMsg("Pesanan berhasil dihapus");
-      setIsError(false);
-      getData();
-    } catch (error) {
-      setMsg("Gagal menghapus pesanan");
-      setIsError(true);
-    }
+  const confirmAction = (action, message, onConfirm) => {
+    Swal.fire({
+      title: 'Konfirmasi',
+      text: message,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, lakukan',
+      cancelButtonText: 'Tidak, batalkan',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onConfirm();
+      }
+    });
+  };
+
+  const updateOrderStatus = (orderCode, statusId) => {
+    confirmAction(
+      'update',
+      'Apakah Anda yakin ingin mengubah status pesanan?',
+      async () => {
+        try {
+          await axios.patch(`${Endpoints.order}/status`, {
+            id: 0,
+            order_code: orderCode,
+            status_id: statusId
+          });
+          Swal.fire({
+            title: "Update Pesanan!",
+            text: "Status Pesanan Berhasil Diubah",
+            icon: "success",
+            button: false,
+            timer: 1500
+          });
+          getData(); // Refresh data after update
+        } catch (error) {
+          console.log("Error yaa ", error);
+          Swal.fire({
+            title: "Update Pesanan!",
+            text: "Gagal Mengubah Status Pesanan",
+            icon: "error",
+            button: false,
+            timer: 1500
+          });
+        }
+      }
+    );
+  };
+
+  const deleteOrder = (orderCode) => {
+    confirmAction(
+      'delete',
+      'Apakah Anda yakin ingin membatalkan pesanan?',
+      async () => {
+        try {
+          await axios.patch(`${Endpoints.order}/status`, {
+            id: 0,
+            order_code: orderCode,
+            status_id: 2 // Batal
+          });
+          Swal.fire({
+            title: "Update Pesanan!",
+            text: "Sukses Membatalkan Pesanan",
+            icon: "success",
+            button: false,
+            timer: 1500
+          });
+          getData(); // Refresh data after deletion
+        } catch (error) {
+          console.log("Error yaa ", error);
+          Swal.fire({
+            title: "Update Pesanan!",
+            text: "Gagal Membatalkan Pesanan",
+            icon: "error",
+            button: false,
+            timer: 1500
+          });
+        }
+      }
+    );
   };
 
   const getStatusName = (statusId) => {
     const status = statuses.find((status) => status.id === statusId);
     return status ? status.name : "Tidak Diketahui";
   };
+
+  function getStatusColor(statusId) {
+    switch (statusId) {
+      case 5: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800'; // Menunggu Konfirmasi
+      case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
+      case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
+      case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
+      case 6: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800'; // Dihidangkan
+      default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
+    }
+  }
 
   const formatDate = (dateString) => {
     const options = { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" };
@@ -69,7 +147,7 @@ const DataOrderPage = () => {
 
   const filteredOrderData = orderData.filter((order) => {
     const orderCodeMatch = order.order_code.toLowerCase().includes(filterOrderCode.toLowerCase());
-    const statusMatch = !filterStatus || order.status_id === parseInt(filterStatus);
+    const statusMatch = !filterStatus || (order.status_id === parseInt(filterStatus));
     return orderCodeMatch && statusMatch;
   });
 
@@ -101,6 +179,10 @@ const DataOrderPage = () => {
 
   const groupedOrders = Object.values(groupedOrderData);
 
+  // Separate orders based on their status
+  const ordersInProgress = groupedOrders.filter(order => order.status_id === 5 || order.status_id === 4 || order.status_id === 6);
+  const completedAndCanceledOrders = groupedOrders.filter(order => order.status_id === 3 || order.status_id === 2);
+
   return (
     <Layout>
       <div className="z-999">
@@ -129,9 +211,11 @@ const DataOrderPage = () => {
             >
               <option value="">Pilih Status</option>
               {statuses.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.name}
-                </option>
+                status.name !== 'Prapesan' && (
+                  <option key={status.id} value={status.id}>
+                    {status.name}
+                  </option>
+                )
               ))}
             </select>
           </div>
@@ -154,7 +238,7 @@ const DataOrderPage = () => {
                         Status
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Tanggal Pesanan
+                        Tanggal
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Aksi
@@ -162,76 +246,112 @@ const DataOrderPage = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {groupedOrders.length > 0 ? (
-                      groupedOrders.map((order, index) => (
-                        <React.Fragment key={index}>
-                          <tr>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.table_number}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.order_code}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getStatusName(order.status_id)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {formatDate(order.order_date)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  onClick={() => toggleDetail(order.id)}
-                                  className="bg-yellow-500 hover:bg-yellow-700 text-white p-2 rounded-lg"
-                                >
-                                  Detail
-                                </button>
-                                <a
-                                  href={`/order/edit/${order.id}`}
-                                  className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
-                                >
-                                  Ubah Status
-                                </a>
-                                <button
-                                  onClick={() => {
-                                    Swal.fire({
-                                      title: 'Apakah Anda yakin?',
-                                      text: "Anda tidak dapat membatalkan pesanan setelah dihapus!",
-                                      icon: 'warning',
-                                      showCancelButton: true,
-                                      confirmButtonColor: '#3085d6',
-                                      cancelButtonColor: '#d33',
-                                      confirmButtonText: 'Hapus',
-                                      cancelButtonText: 'Batal'
-                                    }).then((result) => {
-                                      if (result.isConfirmed) {
-                                        deleteOrder(order.id);
-                                      }
-                                    });
-                                  }}
-                                  className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg"
-                                >
-                                  Batalkan Pesanan
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="5" className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                          Data tidak ditemukan.
+                    {ordersInProgress.map((order) => (
+                      <tr key={order.order_code}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.table_number}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.order_code}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span className={getStatusColor(order.status_id)}>{getStatusName(order.status_id)}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.created_at)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          {order.status_id === 5 && (
+                            <>
+                              <button
+                                onClick={() => updateOrderStatus(order.order_code, 4)} // Set to Proses
+                                className="text-green-600 hover:text-green-900"
+                              >
+                                Proses
+                              </button>
+                              <button
+                                onClick={() => deleteOrder(order.order_code)}
+                                className="ml-4 text-red-600 hover:text-red-900"
+                              >
+                                Batal
+                              </button>
+                              <button
+                                onClick={() => toggleDetail(order.id)}
+                                className="ml-4 text-blue-600 hover:text-blue-900"
+                              >
+                                Detail
+                              </button>
+                            </>
+                          )}
+                          {order.status_id === 4 && (
+                            <>
+                              <button
+                                onClick={() => updateOrderStatus(order.order_code, 6)} // Set to Dihidangkan
+                                className="text-purple-600 hover:text-purple-900"
+                              >
+                                Dihidangkan
+                              </button>
+                              <button
+                                onClick={() => toggleDetail(order.id)}
+                                className="ml-4 text-blue-600 hover:text-blue-900"
+                              >
+                                Detail
+                              </button>
+                            </>
+                          )}
+                          {order.status_id === 6 && (
+                            <>
+                              <button
+                                onClick={() => updateOrderStatus(order.order_code, 3)} // Set to Selesai
+                                className="text-green-600 hover:text-green-900"
+                              >
+                                Selesai
+                              </button>
+                              <button
+                                onClick={() => toggleDetail(order.id)}
+                                className="ml-4 text-blue-600 hover:text-blue-900"
+                              >
+                                Detail
+                              </button>
+                            </>
+                          )}
+                          {order.status_id === 3 || order.status_id === 2 && (
+                            <button
+                              onClick={() => toggleDetail(order.id)}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              Detail
+                            </button>
+                          )}
                         </td>
                       </tr>
-                    )}
+                    ))}
+                    {completedAndCanceledOrders.map((order) => (
+                      <tr key={order.order_code}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.table_number}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.order_code}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span className={getStatusColor(order.status_id)}>{getStatusName(order.status_id)}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.created_at)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => toggleDetail(order.id)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            Detail
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <DetailOrder
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        order={groupedOrders.find((order) => order.id === detailOrderId)}
-      />
+        {isModalOpen && detailOrderId && (
+          <DetailOrder
+            orderId={detailOrderId}
+            closeModal={closeModal}
+          />
+        )}
+      </div>
     </Layout>
   );
 };

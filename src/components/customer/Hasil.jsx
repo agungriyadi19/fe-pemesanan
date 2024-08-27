@@ -110,7 +110,6 @@ export default class Hasil extends Component {
 
   render() {
     const { keranjangs } = this.props
-    console.log(keranjangs);
     
     return (
       <div className="">

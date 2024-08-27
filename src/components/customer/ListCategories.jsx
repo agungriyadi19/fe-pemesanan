@@ -25,7 +25,6 @@ export default class ListCategories extends Component {
     axios.get(Endpoints.category)
       .then(res => {
         const categories = res.data.categories;
-        console.log(categories);
         this.setState({ categories });
       })
       .catch(error => {

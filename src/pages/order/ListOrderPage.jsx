@@ -40,26 +40,33 @@ const DataOrderPage = () => {
     }
   };
 
+  function getStatusColor(statusId) {
+    switch (statusId) {
+      case 5: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800'; // Menunggu Konfirmasi
+      case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
+      case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
+      case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
+      default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
+    }
+  }
+
+
   const getStatuses = async () => {
-    const token = readCookie('token'); // Retrieve the token from cookies
     try {
-      const response = await axios.get(Endpoints.status, {
-        headers: {
-          Authorization: `Bearer ${token}` // Include token in headers
-        }
-      });
+      const response = await axios.get(Endpoints.status);
       if (response.data.statuses && response.data.statuses.length >= 0) {
-        setStatuses(response.data.statuses);
+        const filteredStatuses = response.data.statuses.filter(status => status.name !== 'Prapesan');
+        setStatuses(filteredStatuses);
       }
     } catch (error) {
-      setMsg("Error fetching statuses");
+      setMsg("Gagal mengambil status");
       setIsError(true);
     }
   };
 
   const getStatusName = (statusId) => {
     const status = statuses.find((status) => status.id === statusId);
-    return status ? status.name : "Unknown";
+    return status ? status.name : "Tidak Diketahui";
   };
 
   const handleDateFilter = () => {
@@ -87,9 +94,11 @@ const DataOrderPage = () => {
 
   // Filter orderData based on filterOrderCode and filterStatus
   const filteredOrderData = orderData.filter((order) => {
+    console.log("order", order);
+    const statusName = getStatusName(order.status_id);
     const orderCodeMatch = order.order_code.toLowerCase().includes(filterOrderCode.toLowerCase());
-    const statusMatch = !filterStatus || order.status_id === parseInt(filterStatus);
-    return orderCodeMatch && statusMatch;
+    const statusMatch = !filterStatus || (order.status_id === parseInt(filterStatus) && getStatusName(order.status_name) !== 'Prapesan');
+    return orderCodeMatch && statusMatch && statusName !== "Tidak Diketahui";
   });
 
   const toggleDetail = (orderId) => {
@@ -105,6 +114,9 @@ const DataOrderPage = () => {
   // Group order data by table number and order code
   const groupedOrderData = filteredOrderData.reduce((acc, order) => {
     const key = `${order.table_number}-${order.order_code}`;
+    if (getStatusName(order.status_id) === 'Prapesan') {
+      return acc;
+    }
     if (!acc[key]) {
       acc[key] = {
         ...order,
@@ -152,20 +164,22 @@ const DataOrderPage = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Filter Status</label>
               <select
-                className="border border-gray-300 p-2 w-full md:w-auto"
+                className="border border-gray-300 p-2"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option value="">Pilih Status</option>
                 {statuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.name}
-                  </option>
+                  status.name !== 'Prapesan' && (
+                    <option key={status.id} value={status.id}>
+                      {status.name}
+                    </option>
+                  )
                 ))}
               </select>
             </div>
           </div>
-          
+
           <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:items-center">
             <div>
               <label className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
@@ -214,7 +228,7 @@ const DataOrderPage = () => {
                         Status
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+                        Aksi
                       </th>
                     </tr>
                   </thead>
@@ -228,7 +242,11 @@ const DataOrderPage = () => {
                               {formatDate(order.order_date)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.total}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getStatusName(order.status_id)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              <span className={`${getStatusColor(order.status_id)}`}>
+                              {getStatusName(order.status_id)}</span>
+                            </td>
+
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <button
                                 onClick={() => toggleDetail(order.id)}

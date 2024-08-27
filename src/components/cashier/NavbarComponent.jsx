@@ -1,48 +1,44 @@
-import React, { useState } from "react";
-import { FaBars } from "react-icons/fa";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { eraseCookie } from '../../utils';
+import { Disclosure } from '@headlessui/react';
+
 
 const NavbarComponent = () => {
-  const [navbarOpen, setNavbarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      eraseCookie('token');
+      eraseCookie('role');
+      navigate("/login"); 
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
-    <div className="font-montserrat">
-      <nav className="relative flex flex-wrap items-center justify-between py-3 bg-white mb-3 z-10 shadow">
-        <div className="container mx-auto flex flex-wrap items-center justify-between">
-          <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
-            <a
-              className="text-2xl md:text-3xl font-bold leading-relaxed inline-block mr-4 px-2 py-2 whitespace-nowrap text-purple-700"
-              href="#pablo"
-            >
-              Warmindo
-            </a>
+    <Disclosure as="nav" className="bg-white shadow-md">
+      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div className="relative flex h-16 items-center justify-between">
+          
+          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+            <div className="flex flex-shrink-0 items-center">
+              <h1 className='text-gray-800'>Warmindo</h1>
+            </div>
+          </div>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             <button
-              className="text-purple-700 cursor-pointer text-xl leading-none px-3 py-1 border 
-                border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
-              type="button"
-              onClick={() => setNavbarOpen(!navbarOpen)}
+              className="bg-red-400 hover:bg-red-600 text-white p-2 rounded-lg"
+              onClick={handleLogout}
             >
-              <FaBars />
+              Keluar
             </button>
           </div>
-          <div
-            className={
-              "lg:flex flex-grow items-center" +
-              (navbarOpen ? " flex" : " hidden")
-            }
-            id="example-navbar-danger"
-          >
-            
-            <ul className="ml-auto">
-              <li>
-                <div className="relative inline-block text-left">
-                  <button className="bg-red-500 hover:bg-red-700 text-white p-2 rounded-lg">Keluar</button>
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
-      </nav>
-    </div>
+      </div>
+
+    </Disclosure>
   );
 };
 
