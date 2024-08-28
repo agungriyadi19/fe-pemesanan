@@ -4,8 +4,10 @@ import Layout from "../Layout";
 import axios from "axios";
 import Notification from "../../../components/Notification";
 import { Endpoints } from "../../../api";
-import DetailOrder from "../../../components/order/DetailOrder";
+import DetailOrder from "../../../components/cashier/DetailOrder";
+import OrderActions from "../../../components/cashier/OrderActions";
 import Swal from 'sweetalert2';
+import { getStatusColor } from '../../../utils'
 
 const DataOrderPage = () => {
   const [orderData, setOrderData] = useState([]);
@@ -92,7 +94,7 @@ const DataOrderPage = () => {
     );
   };
 
-  const deleteOrder = (orderCode) => {
+  const cancelOrder = (orderCode) => {
     confirmAction(
       'delete',
       'Apakah Anda yakin ingin membatalkan pesanan?',
@@ -130,17 +132,6 @@ const DataOrderPage = () => {
     return status ? status.name : "Tidak Diketahui";
   };
 
-  function getStatusColor(statusId) {
-    switch (statusId) {
-      case 5: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800'; // Menunggu Konfirmasi
-      case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
-      case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
-      case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
-      case 6: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800'; // Dihidangkan
-      default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
-    }
-  }
-
   const formatDate = (dateString) => {
     const options = { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" };
     return new Date(dateString).toLocaleDateString("id-ID", options);
@@ -153,6 +144,7 @@ const DataOrderPage = () => {
   });
 
   const toggleDetail = (orderId) => {
+    
     setDetailOrderId(orderId);
     setIsModalOpen(true);
   };
@@ -171,6 +163,9 @@ const DataOrderPage = () => {
       };
     }
     acc[key].menus.push({
+      id: order.id,
+      status_id: order.status_id,
+      status_name: order.status_name,
       name: order.menu.name,
       price: order.menu.price,
       amount: order.amount
@@ -183,7 +178,10 @@ const DataOrderPage = () => {
   // Separate orders based on their status
   const ordersInProgress = groupedOrders.filter(order => order.status_id === 5 || order.status_id === 4 || order.status_id === 6);
   const completedAndCanceledOrders = groupedOrders.filter(order => order.status_id === 3 || order.status_id === 2);
-
+  const ordersWithTotal = groupedOrders.map(order => {
+    const total = order.menus.reduce((sum, menu) => sum + (menu.price * menu.amount), 0);
+    return { ...order, total };
+  });
   return (
     <Layout>
       <div className="z-999">
@@ -255,69 +253,8 @@ const DataOrderPage = () => {
                           <span className={getStatusColor(order.status_id)}>{getStatusName(order.status_id)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.created_at)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          {order.status_id === 5 && (
-                            <>
-                              <button
-                                onClick={() => updateOrderStatus(order.order_code, 4)} // Set to Proses
-                                className="text-green-600 hover:text-green-900"
-                              >
-                                Proses
-                              </button>
-                              <button
-                                onClick={() => deleteOrder(order.order_code)}
-                                className="ml-4 text-red-600 hover:text-red-900"
-                              >
-                                Batal
-                              </button>
-                              <button
-                                onClick={() => toggleDetail(order.id)}
-                                className="ml-4 text-blue-600 hover:text-blue-900"
-                              >
-                                Detail
-                              </button>
-                            </>
-                          )}
-                          {order.status_id === 4 && (
-                            <>
-                              <button
-                                onClick={() => updateOrderStatus(order.order_code, 6)} // Set to Dihidangkan
-                                className="text-purple-600 hover:text-purple-900"
-                              >
-                                Dihidangkan
-                              </button>
-                              <button
-                                onClick={() => toggleDetail(order.id)}
-                                className="ml-4 text-blue-600 hover:text-blue-900"
-                              >
-                                Detail
-                              </button>
-                            </>
-                          )}
-                          {order.status_id === 6 && (
-                            <>
-                              <button
-                                onClick={() => updateOrderStatus(order.order_code, 3)} // Set to Selesai
-                                className="text-green-600 hover:text-green-900"
-                              >
-                                Selesai
-                              </button>
-                              <button
-                                onClick={() => toggleDetail(order.id)}
-                                className="ml-4 text-blue-600 hover:text-blue-900"
-                              >
-                                Detail
-                              </button>
-                            </>
-                          )}
-                          {order.status_id === 3 || order.status_id === 2 && (
-                            <button
-                              onClick={() => toggleDetail(order.id)}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Detail
-                            </button>
-                          )}
+                        <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                        <OrderActions order={order} getData={getData} toggleDetail={toggleDetail} />
                         </td>
                       </tr>
                     ))}
@@ -332,7 +269,7 @@ const DataOrderPage = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => toggleDetail(order.id)}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                           >
                             Detail
                           </button>
@@ -346,12 +283,12 @@ const DataOrderPage = () => {
           </div>
         </div>
 
-        {isModalOpen && detailOrderId && (
-          <DetailOrder
-            orderId={detailOrderId}
-            closeModal={closeModal}
-          />
-        )}
+        <DetailOrder
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        order={ordersWithTotal.find((order) => order.id === detailOrderId)}
+      />
+        
       </div>
     </Layout>
   );

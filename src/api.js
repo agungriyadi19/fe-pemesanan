@@ -14,4 +14,5 @@ export const Endpoints = {
   setting: `${apiURl}/api/settings`,
   scan: `${apiURl}/api/customer/check-radius`,
   checkCode: `${apiURl}/api/customer/check-code`,
+  checkActive: `${apiURl}/api/customer/check-active`,
 }

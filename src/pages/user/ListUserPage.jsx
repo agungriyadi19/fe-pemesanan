@@ -121,10 +121,10 @@ const DataUserPage = () => {
       <div className="mt-5 container mx-auto">
         <h1 className="text-3xl font-semibold mb-3 text-center">Data Staff</h1>
 
-        <div className="mt-4 mb-4 flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
+        <div className="mt-4 mb-4 grid gap-4 md:grid-cols-3 items-center">
+          <div className="grid gap-2 md:col-span-2">
             <input
-              className="border border-gray-300 p-2 mr-2"
+              className="border border-gray-300 p-2"
               type="text"
               placeholder="Filter berdasarkan Nama"
               value={filterName}
@@ -144,15 +144,16 @@ const DataUserPage = () => {
             </select>
           </div>
 
-          <div>
+          {/* <div className="md:text-right"> */}
             <button
-              className="bg-green-500 hover:bg-green-700 text-white p-2 rounded-lg"
+              className="bg-green-500 hover:bg-green-700 text-white p-2 rounded-lg w-full md:w-auto"
               onClick={openAddModal}
             >
               Tambah Staff
             </button>
-          </div>
+          {/* </div> */}
         </div>
+
 
         <div className="mt-4 mb-4 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -238,7 +239,7 @@ const DataUserPage = () => {
         <FormEditData isOpen={isEditModalOpen} onClose={closeEditModal} userId={editUserId} onDataChange={handleDataChange} />
       )}
     </Layout>
-    
+
   );
 };
 

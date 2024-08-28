@@ -107,7 +107,7 @@ export default class Home extends Component {
         }
 
         axios
-            .post(Endpoints.checkCode, { table_number: tableNumber, order_code: orderCode })
+            .post(Endpoints.checkActive, { table_number: tableNumber, order_code: orderCode })
             .then(res => {
                 const { active } = res.data;
                 if (!active) {
@@ -139,7 +139,7 @@ export default class Home extends Component {
 
                         {/* Menus List */}
                         <div className="col-span-5">
-                            <h2 className="text-2xl font-bold mb-4">Daftar Produk</h2>
+                            <h2 className="text-2xl font-bold mb-4">Daftar Menu</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {menus.map(menu => (
                                     <Menus key={menu.id} menu={menu} masukKeranjang={this.masukKeranjang} />

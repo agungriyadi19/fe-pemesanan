@@ -2,6 +2,7 @@ import React from 'react';
 import { numberWithCommas } from '../../utils'
 
 const DetailOrder = ({ isOpen, onClose, order }) => {
+
   if (!isOpen || !order) return null;
 
   const calculateTotal = () => {
@@ -14,6 +15,7 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
       case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
       case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
       case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
+      case 6: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800'; // Dihidangkan
       default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
     }
   }
@@ -31,7 +33,7 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
           >
-            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.7l-2.651 2.652a1.2 1.2 0 1 1-1.697-1.697L8.3 10 5.648 7.348a1.2 1.2 0 1 1 1.697-1.697L10 8.3l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.7 10l2.652 2.651a1.2 1.2 0 0 1 0 1.698z"/>
+            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.7l-2.651 2.652a1.2 1.2 0 1 1-1.697-1.697L8.3 10 5.648 7.348a1.2 1.2 0 1 1 1.697-1.697L10 8.3l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.7 10l2.652 2.651a1.2 1.2 0 0 1 0 1.698z" />
           </svg>
         </span>
         <div>
@@ -42,8 +44,8 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
               <thead>
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Menu</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
@@ -56,11 +58,11 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.amount)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{numberWithCommas(menu.amount * menu.price)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    <span className={`${getStatusColor(order.status_id)}`}>
-                    {menu.status_name}
-                    </span>
+                      <span className={`${getStatusColor(order.status_id)}`}>
+                        {menu.status_name}
+                      </span>
                     </td>
-                    </tr>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -73,10 +75,10 @@ const DetailOrder = ({ isOpen, onClose, order }) => {
                   <span className="font-medium">Menu: </span>{menu.name}
                 </div>
                 <div className="mb-2">
-                  <span className="font-medium">Price: </span>{numberWithCommas(menu.price)}
+                  <span className="font-medium">Harga: </span>{numberWithCommas(menu.price)}
                 </div>
                 <div className="mb-2">
-                  <span className="font-medium">Amount: </span>{numberWithCommas(menu.amount)}
+                  <span className="font-medium">Jumlah: </span>{numberWithCommas(menu.amount)}
                 </div>
                 <div className="mb-2">
                   <span className="font-medium">Total: </span>{numberWithCommas(menu.amount * menu.price)}

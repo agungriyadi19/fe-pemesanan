@@ -55,7 +55,7 @@ const Riwayat = () => {
         }
 
         axios
-            .post(Endpoints.checkCode, { table_number: tableNumber, order_code: orderCode })
+            .post(Endpoints.checkActive, { table_number: tableNumber, order_code: orderCode })
             .then(res => {
                 const { active } = res.data;
                 if (!active) {
@@ -72,11 +72,22 @@ const Riwayat = () => {
             });
     }, []);
 
+    function getStatusColor(statusId) {
+        switch (statusId) {
+            case 5: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800'; // Menunggu Konfirmasi
+            case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
+            case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
+            case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
+            case 6: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800'; // Dihidangkan
+            default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
+        }
+    }
+
     return (
         <div className="bg-gray-50 min-h-screen">
             <NavComponents />
             <div className="container mx-auto p-4">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">Order Details</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">Daftar Pesanan</h3>
 
                 {keranjangs.length > 0 && (
                     <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
@@ -104,15 +115,9 @@ const Riwayat = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{order.amount}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{numberWithCommas(order.amount * order.menu.price)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                                        {order.status_name === 'menunggu konfirmasi' ? (
-                                            <span className="text-yellow-500 flex items-center">
-                                                <FaCheckCircle className="mr-2" /> {order.status_name}
-                                            </span>
-                                        ) : (
-                                            <span className="text-red-500 flex items-center">
-                                                <FaTimesCircle className="mr-2" /> {order.status_name}
-                                            </span>
-                                        )}
+                                        <span className={`${getStatusColor(order.status_id)}`}>
+                                            {order.status_name}
+                                        </span>
                                     </td>
                                 </tr>
                             ))}
@@ -137,15 +142,9 @@ const Riwayat = () => {
                             </div>
                             <div className="mb-2">
                                 <span className="font-semibold text-gray-800">Status:</span>
-                                {order.status_name === 'menunggu konfirmasi' ? (
-                                    <span className="text-yellow-500 flex items-center">
-                                        <FaCheckCircle className="mr-2" /> {order.status_name}
-                                    </span>
-                                ) : (
-                                    <span className="text-red-500 flex items-center">
-                                        <FaTimesCircle className="mr-2" /> {order.status_name}
-                                    </span>
-                                )}
+                                <span className={`${getStatusColor(order.status_id)}`}>
+                                    {order.status_name}
+                                </span>
                             </div>
                         </div>
                     ))}

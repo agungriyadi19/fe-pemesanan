@@ -3,8 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
 import ListUserPage from "./pages/user/ListUserPage";
-import AddOrderPage from "./pages/order/AddOrderPage";
-import EditOrderPage from "./pages/order/EditOrderPage";
 import ListOrderPage from "./pages/order/ListOrderPage";
 import CashierListOrderPage from "./pages/cashier/order/CashierListOrderPage";
 import ListMenuPage from "./pages/menu/ListMenuPage";
@@ -24,8 +22,6 @@ function App() {
         
         {/* Admin */}
         <Route path="/order" element={<PrivateRoute element={<ListOrderPage />} allowedRoles={[1]} />} />
-        <Route path="/order/add" element={<PrivateRoute element={<AddOrderPage />} allowedRoles={[1]} />} />
-        <Route path="/order/edit/:id" element={<PrivateRoute element={<EditOrderPage />} allowedRoles={[1]} />} />
         
         <Route path="/menu" element={<PrivateRoute element={<ListMenuPage />} allowedRoles={[1]} />} />
         

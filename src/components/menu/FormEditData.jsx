@@ -35,7 +35,7 @@ const FormEditData = ({ isOpen, onClose, menuId, refreshData }) => {
           const data = menuResponse.data.menu;
           if (data) {
             setName(data.name);
-            setImageUrl(`${apiURl}/${data.image}`); // Set URL for image preview
+            setImageUrl(`data:image/png;base64,${data.image}`); // Set URL for image preview
             setDescription(data.description);
             setPrice(data.price.toString());
             setCategoryId(data.category_id.toString());

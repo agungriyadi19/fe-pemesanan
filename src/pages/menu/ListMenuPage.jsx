@@ -3,17 +3,17 @@ import Layout from "../Layout";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import { Endpoints } from "../../api";
-import { numberWithCommas, readCookie } from '../../utils'; 
-import FormTambahData from "../../components/menu/FormTambahData"; 
-import FormEditData from "../../components/menu/FormEditData"; 
+import { numberWithCommas, readCookie } from '../../utils';
+import FormTambahData from "../../components/menu/FormTambahData";
+import FormEditData from "../../components/menu/FormEditData";
 
 const ListMenuPage = () => {
   const [menuData, setMenuData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [filterName, setFilterName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [isFormTambahDataOpen, setIsFormTambahDataOpen] = useState(false); 
-  const [isFormEditDataOpen, setIsFormEditDataOpen] = useState(false); 
+  const [isFormTambahDataOpen, setIsFormTambahDataOpen] = useState(false);
+  const [isFormEditDataOpen, setIsFormEditDataOpen] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null);
 
   useEffect(() => {
@@ -80,8 +80,8 @@ const ListMenuPage = () => {
     <Layout>
       <div className="mt-5 container mx-auto p-4">
         <h1 className="text-3xl font-semibold mb-3 text-center">Data Menu</h1>
-        <div className="flex justify-between mb-4 items-center">
-          <div className="flex space-x-2">
+        <div className="grid gap-4 mb-4 md:grid-cols-3 items-center">
+          <div className="grid gap-2 md:col-span-2">
             <input
               className="border border-gray-300 p-2 rounded"
               type="text"
@@ -109,6 +109,7 @@ const ListMenuPage = () => {
             Tambah Menu
           </button>
         </div>
+
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md rounded-lg">
@@ -156,15 +157,15 @@ const ListMenuPage = () => {
           </table>
         </div>
 
-        <FormTambahData 
-          isOpen={isFormTambahDataOpen} 
-          onClose={() => setIsFormTambahDataOpen(false)} 
+        <FormTambahData
+          isOpen={isFormTambahDataOpen}
+          onClose={() => setIsFormTambahDataOpen(false)}
           refreshData={fetchData}
         />
 
-        <FormEditData 
-          isOpen={isFormEditDataOpen} 
-          onClose={() => setIsFormEditDataOpen(false)} 
+        <FormEditData
+          isOpen={isFormEditDataOpen}
+          onClose={() => setIsFormEditDataOpen(false)}
           menuId={selectedMenuId}
           refreshData={fetchData}
         />

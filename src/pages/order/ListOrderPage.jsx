@@ -95,7 +95,6 @@ const DataOrderPage = () => {
 
   // Filter orderData based on filterOrderCode and filterStatus
   const filteredOrderData = orderData.filter((order) => {
-    console.log("order", order);
     const statusName = getStatusName(order.status_id);
     const orderCodeMatch = order.order_code.toLowerCase().includes(filterOrderCode.toLowerCase());
     const statusMatch = !filterStatus || (order.status_id === parseInt(filterStatus) && getStatusName(order.status_name) !== 'Prapesan');
@@ -103,6 +102,8 @@ const DataOrderPage = () => {
   });
 
   const toggleDetail = (orderId) => {
+    console.log(orderId);
+
     setDetailOrderId(orderId);
     setIsModalOpen(true);
   };
@@ -149,12 +150,12 @@ const DataOrderPage = () => {
       <div className="mt-5 container mx-auto px-4">
         <h1 className="text-3xl font-semibold mb-3 text-center">Data Order</h1>
 
-        <div className="mt-4 mb-4 flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 justify-between items-center">
-          <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:items-center">
+        <div className="mt-4 mb-4 grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">Filter Kode Order</label>
               <input
-                className="border border-gray-300 p-2 mr-2 w-full md:w-auto"
+                className="border border-gray-300 p-2 w-full"
                 type="text"
                 placeholder="Kode Order"
                 value={filterOrderCode}
@@ -165,7 +166,7 @@ const DataOrderPage = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Filter Status</label>
               <select
-                className="border border-gray-300 p-2"
+                className="border border-gray-300 p-2 w-full"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -181,33 +182,36 @@ const DataOrderPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-4 md:flex-row md:items-center">
+          <div className="grid gap-4 md:grid-cols-3">
             <div>
               <label className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
               <input
-                className="border border-gray-300 p-2 w-full md:w-auto"
+                className="border border-gray-300 p-2 w-full"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Tanggal Akhir</label>
               <input
-                className="border border-gray-300 p-2 w-full md:w-auto"
+                className="border border-gray-300 p-2 w-full"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
+
             <button
               onClick={handleDateFilter}
-              className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg w-full md:w-auto"
+              className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg w-full"
             >
               Filter Tanggal
             </button>
           </div>
         </div>
+
 
         <div className="flex flex-col mt-4">
           <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -245,7 +249,7 @@ const DataOrderPage = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.total}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                               <span className={`${getStatusColor(order.status_id)}`}>
-                              {getStatusName(order.status_id)}</span>
+                                {getStatusName(order.status_id)}</span>
                             </td>
 
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
