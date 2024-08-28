@@ -4,13 +4,14 @@ import axios from "axios";
 import { Endpoints } from "../../api";
 import Cookies from 'js-cookie';
 import { NavComponents } from '../../components/customer';
-import { numberWithCommas } from '../../utils';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Icons for status
+import { numberWithCommas, getStatusColor } from '../../utils';
 import { useNavigate } from 'react-router-dom';
 
 const Riwayat = () => {
     const navigate = useNavigate();
     const [keranjangs, setKeranjangs] = useState([]);
+    const [orderCode, setOrderCode] = useState("");
+    const [tableNumber, setTableNumber] = useState(0);
     const [total, setTotal] = useState(0);
 
     // Use useCallback to memoize the function
@@ -48,6 +49,8 @@ const Riwayat = () => {
         // Retrieve data from cookies
         const tableNumber = Number(Cookies.get('table_number')); // Replace with actual cookie name if different
         const orderCode = Cookies.get('order_code'); // Replace with actual cookie name if different
+        setOrderCode(orderCode);
+        setTableNumber(tableNumber);
 
         if (!tableNumber || !orderCode) {
             // Handle missing cookie data, if necessary
@@ -72,29 +75,15 @@ const Riwayat = () => {
             });
     }, []);
 
-    function getStatusColor(statusId) {
-        switch (statusId) {
-            case 5: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800'; // Menunggu Konfirmasi
-            case 4: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800'; // Proses
-            case 3: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'; // Selesai
-            case 2: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800'; // Batal
-            case 6: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800'; // Dihidangkan
-            default: return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800';
-        }
-    }
-
     return (
         <div className="bg-gray-50 min-h-screen">
             <NavComponents />
             <div className="container mx-auto p-4">
                 <h3 className="text-2xl font-bold text-gray-800 mb-4">Daftar Pesanan</h3>
-
-                {keranjangs.length > 0 && (
-                    <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
-                        <p className="text-gray-600"><span className="font-semibold">Order Code:</span> {keranjangs[0].order_code}</p>
-                        <p className="text-gray-600"><span className="font-semibold">Table Number:</span> {keranjangs[0].table_number}</p>
-                    </div>
-                )}
+                <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
+                    <p className="text-gray-600"><span className="font-semibold">Order Code:</span> {orderCode}</p>
+                    <p className="text-gray-600"><span className="font-semibold">Table Number:</span> {tableNumber}</p>
+                </div>
 
                 <div className="hidden md:block">
                     <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
