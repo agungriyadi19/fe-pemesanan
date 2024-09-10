@@ -5,7 +5,7 @@ import Modal from "../Modal";
 import swal from 'sweetalert';
 import { readCookie } from '../../utils'; // Assuming you have a utility to read cookies
 
-const FormEditData = ({ isOpen, onClose, userId }) => {
+const FormEditData = ({ isOpen, onClose, userId, onDataChange }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -85,6 +85,7 @@ const FormEditData = ({ isOpen, onClose, userId }) => {
       });
 
       swal("Berhasil", "Pengguna berhasil diperbarui", "success");
+      onDataChange();
       onClose(); // Close the modal on success
     } catch (error) {
       swal("Error", "Gagal memperbarui pengguna", "error");

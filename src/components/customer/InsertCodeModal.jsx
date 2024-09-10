@@ -16,9 +16,6 @@ const InsertCodeModal = ({ isOpen, onRequestClose }) => {
 
     const handleInsertCode = async () => {
         try {
-            console.log(code);
-            console.log(table);
-            
             // Ensure code and table are valid
             if (!code || !table) {
                 Swal.fire({

@@ -5,7 +5,7 @@ import swal from 'sweetalert';
 import Modal from '../Modal';
 import { readCookie } from '../../utils'; // Assuming you have a utility to read cookies
 
-function FormTambahData({ isOpen, onClose }) {
+function FormTambahData({ isOpen, onClose, onDataChange }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -54,6 +54,7 @@ function FormTambahData({ isOpen, onClose }) {
         }
       });
       swal('Berhasil', 'Pengguna berhasil ditambahkan', 'success');
+      onDataChange();
       onClose(); // Close the modal on success
     } catch (error) {
       if (error.response) {

@@ -22,6 +22,11 @@ const DataOrderPage = () => {
   useEffect(() => {
     getData();
     getStatuses();
+    // const interval = setInterval(() => {
+    //   getData();
+    // }, 10000); // 10000ms = 10 seconds
+  
+    // return () => clearInterval(interval);
   }, []);
 
   const getData = async () => {
@@ -139,7 +144,7 @@ const DataOrderPage = () => {
 
   const filteredOrderData = orderData.filter((order) => {
     const orderCodeMatch = order.order_code.toLowerCase().includes(filterOrderCode.toLowerCase());
-    const statusMatch = !filterStatus || (order.status_id === parseInt(filterStatus));
+    const statusMatch = !filterStatus || (order.status_id === parseInt(filterStatus) && getStatusName(order.status_name) !== 'Prapesan');
     return orderCodeMatch && statusMatch;
   });
 
@@ -156,6 +161,9 @@ const DataOrderPage = () => {
 
   const groupedOrderData = filteredOrderData.reduce((acc, order) => {
     const key = `${order.table_number}-${order.order_code}`;
+    if (order.status_name === 'Prapesan') {
+      return acc;
+    }
     if (!acc[key]) {
       acc[key] = {
         ...order,
@@ -189,20 +197,15 @@ const DataOrderPage = () => {
       </div>
       <div className="mt-5 container mx-auto px-4">
         <h1 className="text-3xl font-semibold mb-3 text-center">Data Pesanan</h1>
-
-        <div className="mt-4 mb-4 flex flex-col md:flex-row justify-between items-center">
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Filter berdasarkan Kode Pesanan</label>
+        <div className="grid gap-2 md:col-span-2">
+            
             <input
-              className="border border-gray-300 p-2 mr-2"
+              className="border border-gray-300 p-2"
               type="text"
               placeholder="Kode Pesanan"
               value={filterOrderCode}
               onChange={(e) => setFilterOrderCode(e.target.value)}
             />
-          </div>
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Filter berdasarkan Status</label>
             <select
               className="border border-gray-300 p-2"
               value={filterStatus}
@@ -218,7 +221,6 @@ const DataOrderPage = () => {
               ))}
             </select>
           </div>
-        </div>
 
         <div className="flex flex-col mt-4">
           <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

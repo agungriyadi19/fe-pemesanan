@@ -6,7 +6,6 @@ import swal from 'sweetalert'
 
 export default class TotalBayar extends Component {
     submitTotalBayar = (orderID) => {
-        console.log("orderID", orderID);
         // status id 5 = menunggu konfirmasi
         for (let index = 0; index < orderID.length; index++) {
             let element = orderID[index];

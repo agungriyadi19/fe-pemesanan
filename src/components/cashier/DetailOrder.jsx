@@ -2,7 +2,6 @@ import React from 'react';
 import { numberWithCommas, getStatusColor } from '../../utils'
 import OrderActionDetail from './OrderActionDetail';
 const DetailOrder = ({ isOpen, onClose, order }) => {
-  console.log(order);
 
   if (!isOpen || !order) return null;
 

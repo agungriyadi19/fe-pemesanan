@@ -59,8 +59,6 @@ export default class Hasil extends Component {
 
     const table_number = Cookies.get('table_number');
     const order_code = Cookies.get('order_code');
-
-    console.log(this.state.keranjangDetail);
     
     const data = {
       amount: this.state.amount,

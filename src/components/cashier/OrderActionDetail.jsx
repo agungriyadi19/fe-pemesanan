@@ -4,7 +4,6 @@ import axios from 'axios';
 import { Endpoints } from '../../api';
 
 const OrderActionDetail = ({ id, status }) => {
-  console.log(id, status);
   
   const confirmAction = (message, onConfirm) => {
     Swal.fire({

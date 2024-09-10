@@ -234,9 +234,18 @@ const DataUserPage = () => {
         </div>
       </div>
 
-      <FormTambahData isOpen={isAddModalOpen} onClose={closeAddModal} onDataChange={handleDataChange} />
+      <FormTambahData 
+        isOpen={isAddModalOpen} 
+        onClose={closeAddModal} 
+        onDataChange={handleDataChange} 
+      />
       {isEditModalOpen && (
-        <FormEditData isOpen={isEditModalOpen} onClose={closeEditModal} userId={editUserId} onDataChange={handleDataChange} />
+        <FormEditData 
+          isOpen={isEditModalOpen} 
+          onClose={closeEditModal} 
+          userId={editUserId} 
+          onDataChange={handleDataChange} 
+        />
       )}
     </Layout>
 

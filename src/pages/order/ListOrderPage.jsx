@@ -90,8 +90,6 @@ const DataOrderPage = () => {
   });
 
   const toggleDetail = (orderId) => {
-    console.log(orderId);
-
     setDetailOrderId(orderId);
     setIsModalOpen(true);
   };
