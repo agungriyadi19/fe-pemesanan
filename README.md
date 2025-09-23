@@ -1,70 +1,129 @@
-# Getting Started with Create React App
+# 🍜 Website Pemesanan Warmindo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Website pemesanan **Warmindo** dirancang untuk memudahkan proses pemesanan makanan dan minuman secara digital.  
+Terdapat tiga jenis peran (role) pengguna dalam sistem ini:
 
-## Available Scripts
+- **Admin**
+- **Kasir**
+- **Pelanggan**
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Pendahuluan
+Website ini memiliki tiga akses login utama:
+- Admin (pengelola sistem)
+- Kasir (pengelola pesanan)
+- Pelanggan (pemesan melalui QR Code)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 👨‍💼 Role: Admin
 
-### `npm test`
+### 🔑 Akses Login Admin
+- **Email**: `admin1@gmail.com`  
+- **Password**: `admin1`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 📌 Halaman Admin
+Admin memiliki akses ke **4 halaman utama**:
 
-### `npm run build`
+#### 1. Halaman Dasbor
+- Melihat data pesanan.
+- Filter data berdasarkan:
+  - Kode order
+  - Status pesanan
+  - Tanggal pesanan  
+![Dashboard](assets/admin-dashboard.png)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### 2. Halaman Data Menu
+- Melihat daftar menu.
+- Menambah, mengubah, menghapus menu.
+- Filter data berdasarkan:
+  - Nama menu
+  - Kategori menu  
+![Data Menu](assets/admin-menu.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### 3. Halaman Data Staff
+- Melihat daftar staff.
+- Menambah, mengubah, menghapus staff.
+- Filter data berdasarkan:
+  - Nama staff
+  - Role staff  
+![Data Staff](assets/admin-staff.png)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### 4. Halaman Pengaturan
+- Mengatur jumlah meja.
+- Menentukan lokasi & radius layanan.
+- Setiap meja memiliki QR Code yang dapat diunduh untuk pelanggan.  
+![Pengaturan](assets/admin-settings.png)
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 💁 Role: Kasir
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🔑 Akses Login Kasir
+- **Email**: `kasir@gmail.com`  
+- **Password**: `kasir`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 📌 Halaman Kasir
+Kasir memiliki akses ke **1 halaman utama**:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### Halaman Data Pesanan
+- Mengubah status pesanan.
+- Alur status pesanan:
+  - **Konfirmasi**: Menunggu Konfirmasi ➔ Proses ➔ Dihidangkan ➔ Selesai
+  - **Batal**: Menunggu Konfirmasi ➔ Batal  
+![Pesanan Kasir](assets/kasir-pesanan.png)
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🍴 Role: Pelanggan
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 🔑 Akses Pelanggan
+- Scan QR Code yang tersedia di meja.
+- Akses alamat sesuai nomor meja:  
+  `https://warmindo.netlify.app/scan/{no_meja}`
 
-### Code Splitting
+### 📌 Halaman Scan Pelanggan
+Sebelum memesan, sistem melakukan beberapa validasi:
+1. **Kode Order & Nomor Meja**  
+   - Jika ditemukan di penyimpanan lokal → langsung ke daftar menu.  
+   - Jika tidak, lanjut validasi lokasi.  
+2. **Lokasi**  
+   - Sistem memastikan pelanggan berada dalam radius layanan.  
+3. **Kode Order Aktif**  
+   - Jika ada → pelanggan harus memasukkan kode order.  
+   - Jika tidak ada → sistem membuat kode order baru.  
+![Scan Pelanggan](assets/pelanggan-scan.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 📌 Halaman Daftar Menu
+- Menampilkan kategori & daftar menu.  
+- Fitur:
+  - Memilih menu.
+  - Mengatur jumlah pesanan.
+  - Menghapus pesanan sebelum klik tombol **Pesan**.  
+![Daftar Menu](assets/pelanggan-menu.png)
 
-### Analyzing the Bundle Size
+### 📌 Halaman Daftar Pesanan
+- Menampilkan:
+  - Kode order.
+  - Nomor meja.
+  - Daftar pesanan yang telah dibuat.  
+![Daftar Pesanan](assets/pelanggan-order.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 🛠️ Teknologi yang Digunakan
+- **Frontend**: React + Tailwind CSS  
+- **Backend**: Golang (Fiber)  
+- **Database**: MySQL/PostgreSQL  
+- **Auth**: JWT  
+- **Hosting**: Netlify  
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 📷 Preview QR Code
+Setiap meja memiliki QR Code unik yang dapat dipindai oleh pelanggan.  
+Contoh:  
+![QR Code](assets/qr-code.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
