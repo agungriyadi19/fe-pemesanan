@@ -86,14 +86,14 @@ Kasir memiliki akses ke **1 halaman utama**:
 ### 📌 Halaman Scan Pelanggan
 Sebelum memesan, sistem melakukan beberapa validasi:
 1. **Kode Order & Nomor Meja**  
-   - Jika ditemukan di penyimpanan lokal → langsung ke daftar menu.  
+   - Jika ditemukan di penyimpanan lokal/cookies → langsung ke daftar menu.  
    - Jika tidak, lanjut validasi lokasi.  
 2. **Lokasi**  
    - Sistem memastikan pelanggan berada dalam radius layanan.  
 3. **Kode Order Aktif**  
    - Jika ada → pelanggan harus memasukkan kode order.  
    - Jika tidak ada → sistem membuat kode order baru.  
-![Scan Pelanggan](assets/pelanggan-scan.png)
+
 
 ### 📌 Halaman Daftar Menu
 - Menampilkan kategori & daftar menu.  
