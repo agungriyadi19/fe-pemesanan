@@ -80,8 +80,6 @@ Kasir memiliki akses ke **1 halaman utama**:
 
 ### 🔑 Akses Pelanggan
 - Scan QR Code yang tersedia di meja.
-- Akses alamat sesuai nomor meja:  
-  `https://warmindo.netlify.app/scan/{no_meja}`
 
 ### 📌 Halaman Scan Pelanggan
 Sebelum memesan, sistem melakukan beberapa validasi:
@@ -118,12 +116,5 @@ Sebelum memesan, sistem melakukan beberapa validasi:
 - **Database**: MySQL/PostgreSQL  
 - **Auth**: JWT  
 - **Hosting**: Netlify  
-
----
-
-## 📷 Preview QR Code
-Setiap meja memiliki QR Code unik yang dapat dipindai oleh pelanggan.  
-Contoh:  
-![QR Code](assets/qr-code.png)
 
 ---
