@@ -113,7 +113,7 @@ Sebelum memesan, sistem melakukan beberapa validasi:
 ## 🛠️ Teknologi yang Digunakan
 - **Frontend**: React + Tailwind CSS  
 - **Backend**: Golang (Fiber)  
-- **Database**: MySQL/PostgreSQL  
+- **Database**: PostgreSQL  
 - **Auth**: JWT  
 - **Hosting**: Netlify  
 
